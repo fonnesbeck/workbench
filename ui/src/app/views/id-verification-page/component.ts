@@ -56,7 +56,7 @@ export class IdVerificationPageComponent implements OnInit {
     this.request.dob = dobFormat;
     this.profileService.submitIdVerification(this.request).subscribe(() => {
       this.router.navigate(['profile']);
-    },error => {
+    }, error => {
         this.router.navigate(['profile']);
     });
   }

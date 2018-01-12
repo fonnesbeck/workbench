@@ -12,7 +12,7 @@ function isBlank(s: string) {
 })
 export class IdVerificationPageComponent implements OnInit {
   request: IdVerificationRequest;
-    allFieldsReq : boolean
+    allFieldsReq: boolean;
   constructor(
       private profileService: ProfileService,
       private router: Router
@@ -35,7 +35,7 @@ export class IdVerificationPageComponent implements OnInit {
     this.profileService.getMe().subscribe(
       (profile: Profile) => {
         this.request.firstName = profile.givenName;
-        this.request.lastName = profile.familyName
+        this.request.lastName = profile.familyName;
       });
   }
 
@@ -45,14 +45,14 @@ export class IdVerificationPageComponent implements OnInit {
           this.request.streetLine1, this.request.streetLine2, this.request.city,
           this.request.state, this.request.zip, this.request.dob, this.request.documentNumber,
           this.request.documentType];
-    if(requiredFields.some(isBlank)) {
-      this.allFieldsReq=true;
+    if (requiredFields.some(isBlank)) {
+      this.allFieldsReq = true;
       return;
     }
     this.allFieldsReq = false;
     let dobFormat = this.request.dob;
-    let dobArr = dobFormat.split("/");
-    dobFormat = dobArr[2]+'-'+dobArr[1]+"-"+dobArr[0];
+    const dobArr = dobFormat.split('/');
+    dobFormat = dobArr[2] + '-' + dobArr[1] + '-' + dobArr[0];
     this.request.dob = dobFormat;
     this.profileService.submitIdVerification(this.request).subscribe(() => {
       this.router.navigate(['profile']);

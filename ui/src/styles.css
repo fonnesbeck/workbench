@@ -1,20 +1,47 @@
+/* Fonts */
+@font-face {
+    font-family: GothamBook;
+    src: url('/assets/fonts/Gotham Book.otf');
+}
+@font-face {
+    font-family: GothamBold;
+    src: url('/assets/fonts/Gotham Bold.otf');
+}
+@font-face {
+    font-family: GothamLight;
+    src: url('/assets/fonts/Gotham Light.otf');
+}
+@font-face {
+    font-family: GothamMedium;
+    src: url('/assets/fonts/Gotham Medium.otf');
+}
+
+
 /* Master Styles */
 h1 {
-  color: #369;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 250%;
+  color: #262262;
+  font-family: GothamMedium;
+  font-size: 1.6rem;
 }
-h2, h3 {
-  color: #444;
-  font-family: Arial, Helvetica, sans-serif;
-  font-weight: lighter;
+h2 {
+  color: #262262;
+  font-family: GothamBold;
+  font-size: 1.25rem;
+}
+h3 {
+  color: #262262;
+  font-family: GothamBold;
+  font-size: 1rem;
+}
+h4 {
+  color: #000;
+  font-family: GothamLight;
 }
 body {
   margin: 0.6rem 1.2rem 0 1.2rem;
 }
 body, input[text], button {
   color: #888;
-  font-family: Cambria, Georgia;
 }
 a {
   color: #6fb4ff;
@@ -37,7 +64,6 @@ input[type=text]:focus {
 }
 
 button {
-  font-family: Arial;
   background-color: #eee;
   border: none;
   padding: 0.3rem 0.6rem;
@@ -65,7 +91,7 @@ button:disabled {
 
 /* everywhere else */
 * {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: GothamBook;
 }
 
 .required::after {

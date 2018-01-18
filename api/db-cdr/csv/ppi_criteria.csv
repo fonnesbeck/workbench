@@ -1,0 +1,245 @@
+id,parent_id,type,subtype,code,name,is_group,is_selectable,est_count,concept_id,domain_id
+316327,0,PPI,,ConsentPII,Consent PII,1,0,,1585594,Observation
+316328,0,PPI,,EHRConsentPII,EHRConsent PII,1,0,,1586098,Observation
+316329,0,PPI,,Lifestyle,Lifestyle,1,0,,1585855,Observation
+316330,0,PPI,,OverallHealth,Overall Health,1,0,,1585710,Observation
+316331,0,PPI,,PMI,PMI,1,0,,903102,Observation
+316332,0,PPI,,RefresherConsent,Refresher Consent,1,0,,1585550,Observation
+316333,0,PPI,,TheBasics,The Basics,1,0,,1586134,Observation
+316334,316327,PPI,,ConsentPII_ArizonaSitePairing,Arizona Site Pairing,0,0,,1585469,Observation
+316335,316327,PPI,,ConsentPII_CaliforniaSitePairing,California Site Pairing,0,0,,1585575,Observation
+316336,316327,PPI,,ConsentPII_CHCSitePairing,Community Health Center Site Pairing,0,0,,1585592,Observation
+316337,316327,PPI,,ConsentPII_ColumbiaSitePairing,Columbia Site Pairing,0,0,,1585579,Observation
+316338,316327,PPI,,ConsentPII_EmailAddress,Email Address,0,1,,1585260,Observation
+316339,316327,PPI,,ConsentPII_ExtraConsent,Extra Consent,0,0,,1585476,Observation
+316340,316327,PPI,,ConsentPII_IllinoisSitePairing,Illinois Site Pairing,0,0,,1585513,Observation
+316341,316327,PPI,,ConsentPII_Language,Language,0,0,,1585412,Observation
+316342,316327,PPI,,ConsentPII_MichiganSitePairing,"If participant lives in Michigan, at the conclusion of the consent process (same location as UPMC)",0,0,,1585562,Observation
+316343,316327,PPI,,ConsentPII_MississippiSitePairing,Mississippi Site Pairing,0,0,,1585531,Observation
+316344,316327,PPI,,ConsentPII_NewEnglandSitePairing,New England Site Pairing,0,0,,1585526,Observation
+316345,316327,PPI,,ConsentPII_NewYorkSitePairing,New York Site Pairing,0,0,,1585538,Observation
+316346,316327,PPI,,ConsentPII_PIIAddress,Address,0,0,,1585245,Observation
+316347,316327,PPI,,ConsentPII_PIIBirthInformation,Birth Information,0,0,,1585258,Observation
+316348,316327,PPI,,ConsentPII_PIIContactInformation,Contact Information,0,0,,1585251,Observation
+316349,316327,PPI,,ConsentPII_PIIName,Name,0,0,,1585595,Observation
+316350,316327,PPI,,ConsentPII_SanDiegoSitePairing,San Diego Site Pairing,0,0,,1585542,Observation
+316351,316327,PPI,,ConsentPII_SitePairing,Site Pairing,0,0,,903090,Observation
+316352,316327,PPI,,ConsentPII_SouthCarolinaSitePairing,South Carolina Pairing,0,0,,1585585,Observation
+316353,316327,PPI,,ConsentPII_TennesseeSitePairing,"If participant lives in Tennessee, at the conclusion of the consent process",0,0,,1585571,Observation
+316354,316327,PPI,,ConsentPII_TexasSitePairing,Texas Site Pairing,0,0,,1585522,Observation
+316355,316327,PPI,,ConsentPII_WesternMichiganSitePairing,Western MIchigan Site Pairing,0,0,,1585546,Observation
+316356,316328,PPI,,EHRConsentPII_AccessChangeMind,Once I give access to my EHR can I change my mind?,0,1,,1586113,Observation
+316357,316328,PPI,,EHRConsentPII_AccessHER,Access your HER,0,1,,1586122,Observation
+316358,316328,PPI,,EHRConsentPII_AccessPrivacyGuaruntee,If give access to my EHR is my privacy guaranteed?,0,1,,1586116,Observation
+316359,316328,PPI,,EHRConsentPII_AllOfAccess,Do I have to give all of us access to my EHR?,0,1,,1586107,Observation
+316360,316328,PPI,,EHRConsentPII_AreYouReady,Are you ready to take the quiz?,0,1,,1586104,Observation
+316361,316328,PPI,,EHRConsentPII_ConsentPermission,Do you consent?,0,1,,1586099,Observation
+316362,316328,PPI,,EHRConsentPII_EmailCopy,Email a copy to me,0,1,,1586130,Observation
+316363,316328,PPI,,EHRConsentPII_JoinAllOfUs,Take the time you need to decide about joining All of Us. We are here to answer any questions you have.,0,1,,1586127,Observation
+316364,316328,PPI,,EHRConsentPII_NavigationalText,Navigational Text,0,1,,1586119,Observation
+316365,316328,PPI,,EHRConsentPII_PrivacyRisk,Risk to Privacy,0,1,,1586123,Observation
+316366,316328,PPI,,EHRConsentPII_SensitiveInfoAccess,Will all of us access sensitive information in the EHR?,0,1,,1586110,Observation
+316367,316328,PPI,,EHRConsentPII_Signature,Signature Box,0,1,,1586102,Observation
+316368,316328,PPI,,EHRConsentPII_TakeAsMuchTime,Take as much time you need to decide about giving All of Us access to your EHR. You can review these screens as many times as you like.,0,1,,1586124,Observation
+316369,316328,PPI,,EHRConsentPII_TodaysDate,Today's Date,0,1,,1586103,Observation
+316370,316328,PPI,,EHRConsentPII_YoutubeVideos,Youtube Videos,0,1,,1586131,Observation
+316371,316329,PPI,,Lifestyle_Alcohol,Alcohol,0,0,,1586197,Observation
+316372,316329,PPI,,Lifestyle_RecreationalDrugUse,Recreational Drug Use,0,0,,1585635,Observation
+316373,316329,PPI,,Lifestyle_Smoking,Smoking,0,0,,1585856,Observation
+316374,316330,PPI,,OverallHealth_AverageFatigue7Days,"In the past 7 days, how would you rate your fatigue on average?",0,1,,1585748,Observation
+316375,316330,PPI,,OverallHealth_AveragePain7Days,"In the past 7 days, how would you rate your pain on average?",0,1,,1585747,Observation
+316376,316330,PPI,,OverallHealth_DifficultUnderstandInfo,How often do you have problems learning about your medical condition because of difficulty understanding written information?,0,1,,1585778,Observation
+316377,316330,PPI,,OverallHealth_EmotionalProblem7Days,"In the past 7 days, how often have you been bothered by emotional problems such as feeling anxious, depressed or irritable?",0,1,,1585760,Observation
+316378,316330,PPI,,OverallHealth_EverydayActivities,"To what extent are you able to carry out your everyday physical activities such as walking, climbing stairs, carrying groceries, or moving a chair?",0,1,,1585741,Observation
+316379,316330,PPI,,OverallHealth_GeneralHealth,"In general, would you say your health is:",0,1,,1585711,Observation
+316380,316330,PPI,,OverallHealth_GeneralMentalHealth,"In general, how would you rate your mental health, including your mood and your ability to think?",0,1,,1585729,Observation
+316381,316330,PPI,,OverallHealth_GeneralPhysicalHealth,"In general, how would you rate your physical health?",0,1,,1585723,Observation
+316382,316330,PPI,,OverallHealth_GeneralQuality,"In general, would you say your quality of life is:",0,1,,1585717,Observation
+316383,316330,PPI,,OverallHealth_GeneralSocial,"In general, please rate how well you carry out your usual social roles. (This includes activities at home, at work and in your community, and responsibilities as a parent, child, spouse, employee, friend, etc.)",0,1,,1585754,Observation
+316384,316330,PPI,,OverallHealth_HealthMaterialAssistance,How often do you have someone help you read health-related materials?,0,1,,1585772,Observation
+316385,316330,PPI,,OverallHealth_HysterectomyHistory,"Have you ever had a hysterectomy (that is, surgery to remove your uterus or womb)?",0,1,,1585791,Measurement
+316386,316330,PPI,,OverallHealth_HysterectomyHistoryAge,"If Yes to hysterectomy, age at surgery?",0,1,,1585795,Observation
+316387,316330,PPI,,OverallHealth_MedicalFormConfidence,How confident are you filling out medical forms by yourself?,0,1,,1585766,Observation
+316388,316330,PPI,,OverallHealth_MenstrualStopped,Have your menstrual periods stopped permanently?,0,1,,1585784,Measurement
+316389,316330,PPI,,OverallHealth_OrganTransplant,Have you had a transplant of any type?,0,1,,1585803,Observation
+316390,316330,PPI,,OverallHealth_OutsideTravel6Month,Have you traveled outside of the United States within the past 6 months?,0,1,,1585815,Observation
+316391,316330,PPI,,OverallHealth_OvaryRemovalHistory,Have you ever had an ovary removed?,0,1,,1585796,Observation
+316392,316330,PPI,,OverallHealth_Pregnancy,Pregnancy,0,0,,1585810,Observation
+316393,316330,PPI,,OverallHealth_SocialSatisfaction,"In general, how would you rate your satisfaction with your social activities and relationships?",0,1,,1585735,Observation
+316394,316332,PPI,,RefresherConsent_PhysicalMeasurements,Physical Measurements Youtube Video,0,1,,1585551,Observation
+316395,316332,PPI,,RefresherConsent_SamplesVideo,Samples Youtube Video,0,1,,1585552,Observation
+316396,316332,PPI,,RefresherConsent_VoluntaryParticipation,Participation is voluntary. You do not have to have measurements taken or give samples.,0,1,,1586094,Observation
+316397,316333,PPI,,TheBasics_ActiveDuty,Active Duty,0,0,,1585851,Observation
+316398,316333,PPI,,TheBasics_BiologicalSexAtBirth,Biological Sex at Birth,0,0,,1585844,Observation
+316399,316333,PPI,,TheBasics_Birthplace,In what country were you born?,0,1,,1586135,Measurement
+316400,316333,PPI,,TheBasics_CountryBornTextBox,Country Text Box Question,0,1,,1586137,Observation
+316401,316333,PPI,,TheBasics_EducationLevel,Education Level,0,0,,1585939,Observation
+316402,316333,PPI,,TheBasics_Employment,Employment Status,0,0,,1585951,Observation
+316403,316333,PPI,,TheBasics_Gender,Gender,0,0,,1585347,Observation
+316404,316333,PPI,,TheBasics_HomeOwn,Home Ownership,0,0,,1585369,Observation
+316405,316333,PPI,,TheBasics_Income,Income,0,0,,1585374,Observation
+316406,316333,PPI,,TheBasics_Insurance,Insurance,0,0,,1585385,Observation
+316407,316333,PPI,,TheBasics_LivingSituation,Living Situation,0,0,,1585401,Observation
+316408,316333,PPI,,TheBasics_MaritalStatus,Marital Status,0,0,,1585891,Observation
+316409,316333,PPI,,TheBasics_Race,Race,0,0,,1586138,Observation
+316410,316333,PPI,,TheBasics_SecondaryContactInfo,Secondary Contact Information,0,0,,1585905,Observation
+316411,316333,PPI,,TheBasics_SexualOrientation,Which of the following best represents how you think of yourself?,0,1,,1585899,Observation
+316412,316333,PPI,,TheBasics_SocialSecurity,Social Security,0,0,,1585949,Observation
+316413,316397,PPI,,ActiveDuty_AvtiveDutyServeStatus,"Have you ever served on active duty in the United States Armed forces, either in the regular military or in a National Guard or military reserve unit?",0,1,,1585852,Observation
+316414,316371,PPI,,Alcohol_6orMoreDrinksOccurence,How often did you have six or more drinks on one occasion in the past year?,0,1,,1586213,Observation
+316415,316371,PPI,,Alcohol_AlcoholParticipant,"In your entire life, have you had at least 1 drink of any kind of alcohol, not counting small tastes or sips? (By a âdrink,â we mean a can or bottle of beer, a glass of wine or a wine cooler, a shot of liquor, or a mixed drink with liquor in it.)",0,1,,1586198,Measurement
+316416,316371,PPI,,Alcohol_AverageDailyDrinkCount,"On a typical day when you drink, how many drinks do you have?",0,1,,1586207,Observation
+316417,316371,PPI,,Alcohol_DrinkFrequencyPastYear,How often did you have a drink containing alcohol in the past year?,0,1,,1586201,Observation
+316418,316334,PPI,,ArizonaSitePairing_AZSitepairingLocation,The All of Us Research Program is enrolling participants at the following healthcare sites. At which location do you wish to schedule your visit?,0,1,,1585470,Observation
+316419,316398,PPI,,BiologicalSexAtBirth_SexAtBirth,What was your biological sex assigned at birth?,0,1,,1585845,Observation
+316420,316335,PPI,,CaliforniaSitePairing_CaliforniaUniversityCare,Have you ever received care at any of the following health centers? University of California Irvine Health University of Southern California University of California San Diego,0,1,,1585576,Observation
+316421,316336,PPI,,CHCSitePairing_CHCCareatLocation,Please indicate where you have received care at one of the following locations: CHC Inc Middletown CHC Inc Meriden,0,1,,1585593,Observation
+316422,316337,PPI,,ColumbiaSitePairing_ColumbiaCare,Have you ever received care at any of the following?,0,1,,1585580,Observation
+316423,316401,PPI,,EducationLevel_HighestGrade,What is the highest grade or year of school you completed?,0,1,,1585940,Observation
+316424,316402,PPI,,Employment_EmploymentStatus,What is your current employment status? Please select 1 or more of these categories.,0,1,,1585952,Observation
+316425,316402,PPI,,Employment_EmploymentWorkAddress,If DSS5a= employed for wages or self- âemployed: What is your work street address?,0,1,,1585961,Observation
+316426,316339,PPI,,ExtraConsent_18YearsofAge,Copy of Multi Selector,0,1,,1585477,Observation
+316427,316339,PPI,,ExtraConsent_AgreeToConsent,Agree to Consent,0,1,,1585510,Observation
+316428,316339,PPI,,ExtraConsent_AllOfUsPurpose,What is the purpose of All of Us?,0,1,,1585495,Observation
+316429,316339,PPI,,ExtraConsent_CABoRSignature,Copy of Signature Box,0,1,,1585490,Observation
+316430,316339,PPI,,ExtraConsent_CanIWithdraw,"If I join, can I withdraw (âquitâ)?",0,1,,1585501,Observation
+316431,316339,PPI,,ExtraConsent_DataShaingVideo,Copy of Copy of Copy of Copy of Copy of Copy of Copy of Copy of Youtube Video,0,1,,1585493,Observation
+316432,316339,PPI,,ExtraConsent_DataSharingVideo,Copy of Copy of Copy of Copy of Copy of Youtube Video,0,1,,1585491,Observation
+316433,316339,PPI,,ExtraConsent_EmailACopyToMe,Boolean selector,0,1,,1585492,Observation
+316434,316339,PPI,,ExtraConsent_EverReceivedUPMCCare,Have you ever received care at a UPMC healthcare provider?,0,1,,1585553,Observation
+316435,316339,PPI,,ExtraConsent_FitnessTrackerVideo,ExtraConsent_FitnessTracker_Video,0,1,,1585475,Observation
+316436,316339,PPI,,ExtraConsent_HealthDataVideo,Copy of Copy of Youtube Video,0,1,,1585483,Observation
+316437,316339,PPI,,ExtraConsent_HealthRecordVideo,Copy of Copy of Copy of Copy of Copy of Copy of Youtube Video,0,1,,1585485,Observation
+316438,316339,PPI,,ExtraConsent_KeepinginTouchVideo,Copy of Youtube Video,0,1,,1585488,Observation
+316439,316339,PPI,,ExtraConsent_OtherHealthDataVideo,Copy of Copy of Copy of Copy of Copy of Copy of Copy of Youtube Video,0,1,,1585489,Observation
+316440,316339,PPI,,ExtraConsent_PhysicalMeausrementsVideo,Copy of Copy of Copy of Youtube Video,0,1,,1585480,Observation
+316441,316339,PPI,,ExtraConsent_PresentlyRegisteredPatient,Are you presently a registered patient at any of the following clinics?,0,1,,1585559,Observation
+316442,316339,PPI,,ExtraConsent_PrivacyGuaranteeQuestion,"Using smartphones, apps, and sensors are always a potential risk to privacy. Can All of Us research guarantee your privacy?",0,1,,1585504,Observation
+316443,316339,PPI,,ExtraConsent_ReadyOrNeedHelp,Take the time you need to decide about joining All of Us. We are here to answer any questions you have.,0,1,,1585507,Observation
+316444,316339,PPI,,ExtraConsent_RisktoPrivacyVideo,Copy of Copy of Copy of Copy of Copy of Copy of Copy of Copy of Copy of Youtube Video,0,1,,1585494,Observation
+316445,316339,PPI,,ExtraConsent_SamplesVideo,Copy of Copy of Copy of Copy of Youtube Video,0,1,,1585484,Observation
+316446,316339,PPI,,ExtraConsent_ScheduledWithPACares,Have you already scheduled an appointment with your local PA Cares for Us team for physical measurements and biosample collection?,0,1,,1585556,Observation
+316447,316339,PPI,,ExtraConsent_Signature,Signature Box,0,1,,1585486,Observation
+316448,316339,PPI,,ExtraConsent_TakePartAllOfUs,Do I have to take part in All of Us?,0,1,,1585498,Observation
+316449,316339,PPI,,ExtraConsent_TodaysDate,New Day Selector,0,1,,1585482,Observation
+316450,316339,PPI,,ExtraConsent_WelcomeVideo,Youtube Video,0,1,,1585481,Observation
+316451,316339,PPI,,ExtraConsent__CABoRTodaysDate,Copy of New Day Selector,0,1,,1585487,Observation
+316452,316403,PPI,,Gender_CloserGenderDescription,Are any of these a closer description to your gender identity?,0,1,,1585348,Observation
+316453,316403,PPI,,Gender_GenderIdentity,What terms best express how you describe your gender identity?,0,1,,1585838,Observation
+316454,316404,PPI,,HomeOwn_CurrentHomeOwn,Do you own or rent the place where you live?,0,1,,1585370,Observation
+316455,316340,PPI,,IllinoisSitePairing_IllinoisInstitution,The following Healthcare Providers in your area are enrolling participants into the All of Us Research Program. At which institution do you receive care and wish to schedule an enrollment visit with? Please choose 1 institution,0,1,,1585514,Observation
+316456,316405,PPI,,Income_AnnualIncome,What is your annual household income from all sources?,0,1,,1585375,Observation
+316457,316406,PPI,,Insurance_HealthInsurance,Are you covered by health insurance or some other kind of health care plan?,0,1,,1585386,Measurement
+316458,316341,PPI,,Language_SpokenWrittenLanguage,Spoken/Written Language,0,1,,1585413,Observation
+316459,316407,PPI,,LivingSituation_CurrentLiving,Where are you currently living?,0,1,,1585402,Observation
+316460,316407,PPI,,LivingSituation_HowManyLivingYears,How many years have you lived at your current address?,0,1,,1585879,Observation
+316461,316407,PPI,,LivingSituation_HowManyPeople,"Not including yourself, how many other people live at home with you?",0,1,,1585889,Observation
+316462,316407,PPI,,LivingSituation_LivingSituationFreeText,Living Situation Free Text,0,1,,1585878,Observation
+316463,316407,PPI,,LivingSituation_PeopleUnder18,Think of other people who live with you. How many are under the age of 18 years?,0,1,,1585890,Observation
+316464,316407,PPI,,LivingSituation_StableHouseConcern,"In the past 6 months, have you been worried or concerned about NOT having a place to live?",0,1,,1585886,Observation
+316465,316408,PPI,,MaritalStatus_CurrentMaritalStatus,What is your current marital status?,0,1,,1585892,Observation
+316466,316342,PPI,,MichiganSitePairing_EastSoutheastMichigan,If participant lives in the East/Southeast Michigan Area:,0,0,,1585567,Observation
+316467,316342,PPI,,MichiganSitePairing_LiveInFollowingAreas,Do you live in any of the following general areas? (others coming soon!),0,1,,1585563,Observation
+316468,316343,PPI,,MississippiSitePairing_JacksonHinds,Have you ever received care from a health provider at the Jackson-Hinds Comprehensive Health Center's Main Site (James Anderson Clinic) or the Copiah Clinic?,0,1,,1585532,Observation
+316469,316343,PPI,,MississippiSitePairing_JacksonHindsAppointment,Have you already scheduled an All of Us research appointment at the Jackson-Hinds Comprehensive Health Center's Main Site (James Anderson Clinic) or the Copiah Clinic?,0,1,,1585535,Observation
+316470,316344,PPI,,NewEnglandSitePairing_CareReceived,"Have you ever received care at any hospital, health center or clinic affiliated with Boston Medical Center (BMC) or Partners HealthCare (Partners)?",0,1,,1585527,Observation
+316471,316345,PPI,,NewYorkSitePairing_HRHCare,"Have you ever received care at the Peekskill Health Center, or any other HRHCare health center?",0,1,,1585539,Observation
+316472,316389,PPI,,OrganTransplant_Date,Date of transplant?,0,1,,1585809,Observation
+316473,316389,PPI,,OrganTransplant_OrganTransplantDescription,"If yes, please check all that apply.",0,1,,1585806,Observation
+316474,316390,PPI,,OutsideTravel6Month_OutsideTravel6MonthHowLong,"If yes, how long?",0,1,,1585820,Observation
+316475,316390,PPI,,OutsideTravel6Month_OutsideTravel6MonthWhere,"If yes, where?",0,1,,903065,Observation
+316476,316390,PPI,,OutsideTravel6Month_OutsideTravel6MonthWhereTravel,"If yes, where?",0,1,,1585819,Observation
+316477,316346,PPI,,PIIAddress_StreetAddress,Street Address1,0,1,,1585246,Observation
+316478,316346,PPI,,PIIAddress_StreetAddress2,Street Address 2,0,1,,1585247,Observation
+316479,316347,PPI,,PIIBirthInformation_BirthDate,Date of Birth,0,1,,1585259,Observation
+316480,316348,PPI,,PIIContactInformation_Phone,Phone,0,1,,1585252,Observation
+316481,316348,PPI,,PIIContactInformation_RecontactMethod,Method of Recontact,0,1,,1585253,Observation
+316482,316349,PPI,,PIIName_First,First name,0,1,,1585596,Observation
+316483,316349,PPI,,PIIName_Last,Last name,0,1,,1585598,Observation
+316484,316349,PPI,,PIIName_Middle,Middle name,0,1,,1585597,Observation
+316485,316392,PPI,,Pregnancy_1PregnancyStatus,Are you currently pregnant?,0,1,,1585811,Observation
+316486,316409,PPI,,Race_WhatRaceEthnicity,"Which categories describe you? Select all that apply. Note, you may select more than one group.",0,1,,1586140,Observation
+316487,316372,PPI,,RecreationalDrugUse_Past3MonthUseFrequency,How Often Topic,0,0,,1585649,Observation
+316488,316372,PPI,,RecreationalDrugUse_WhichDrugsUsed,"In your LIFETIME, which of the following substances have you ever used?",0,1,,1585636,Observation
+316489,316350,PPI,,SanDiegoSitePairing_SanDiegoBloodBank,Have you ever donated blood at the San Diego Blood Bank?,0,1,,1585543,Observation
+316490,316410,PPI,,SecondaryContactInfo_FirstContactsInfo,"The PMI will contact you periodically to gather additional health related information. In case we cannot contact you, please provide the names, addresses, and telephone numbers of 2 relatives or friends who would know where you could be reached in case...",0,0,,1585906,Observation
+316491,316410,PPI,,SecondaryContactInfo_PersonOneAddressOne,Person 1 Address Line 1,0,1,,1585910,Observation
+316492,316410,PPI,,SecondaryContactInfo_PersonOneAddressTwo,Person 1 Address Line 2,0,1,,1585911,Observation
+316493,316410,PPI,,SecondaryContactInfo_PersonOneEmail,Person 1 Email Address,0,1,,1585915,Observation
+316494,316410,PPI,,SecondaryContactInfo_PersonOneFirstName,Person 1 name (First),0,1,,1585907,Observation
+316495,316410,PPI,,SecondaryContactInfo_PersonOneLastName,Person 1 name (Last),0,1,,1585909,Observation
+316496,316410,PPI,,SecondaryContactInfo_PersonOneMiddleInitial,Person 1 name (MI),0,1,,1585908,Observation
+316497,316410,PPI,,SecondaryContactInfo_PersonOneRelationship,Relationship to respondent,0,1,,1585917,Observation
+316498,316410,PPI,,SecondaryContactInfo_PersonOneTelephone,Person 1 Area code/Telephone number (allow none refused or dk),0,1,,1585916,Observation
+316499,316410,PPI,,SecondaryContactInfo_SecondContactsAddressOne,Person 2 Address Line 1,0,1,,1585926,Observation
+316500,316410,PPI,,SecondaryContactInfo_SecondContactsAddressTwo,Person 2 Address Line 2,0,1,,1585927,Observation
+316501,316410,PPI,,SecondaryContactInfo_SecondContactsEmail,What is this second person's email address?,0,1,,1585931,Observation
+316502,316410,PPI,,SecondaryContactInfo_SecondContactsFirstName,Person 2 name (First),0,1,,1585923,Observation
+316503,316410,PPI,,SecondaryContactInfo_SecondContactsLastName,Person 2 name (Last),0,1,,1585925,Observation
+316504,316410,PPI,,SecondaryContactInfo_SecondContactsMiddleInitial,Person 2 name (MI),0,1,,1585924,Observation
+316505,316410,PPI,,SecondaryContactInfo_SecondContactsNumber,"What is this second person's telephone number, beginning with the area code?",0,1,,1585932,Observation
+316506,316410,PPI,,SecondaryContactInfo_SecondContactsRelationship,What is this second person's relationship to you?,0,1,,1585933,Observation
+316507,316351,PPI,,SitePairing_CurrentlyReside,Where do you currently reside?,0,1,,903075,Observation
+316508,316373,PPI,,Smoking_100CigsLifetime,Have you smoked at least 100 cigarettes in your entire life? (There are 20 cigarettes in a pack.),0,1,,1585857,Measurement
+316509,316373,PPI,,Smoking_AverageDailyCigaretteNumber,"On average, over the entire time that you smoked, how many cigarettes did you smoke each day? (There are 20 cigarettes in a pack.)",0,1,,1586162,Measurement
+316510,316373,PPI,,Smoking_AverageDailyCigaretteNumberDontKnow,Don't Know,0,1,,1586163,Observation
+316511,316373,PPI,,Smoking_AverageDailyCigaretteNumberPreferNo,Prefer not to answer,0,1,,903064,Observation
+316512,316373,PPI,,Smoking_AverageDailyCigaretteNumberPreferNotToAnsw,Prefer not to answer,0,1,,1586164,Observation
+316513,316373,PPI,,Smoking_CigarSmoking,Cigar Smoking,0,0,,1586173,Observation
+316514,316373,PPI,,Smoking_CurrentDailyCigaretteNumber,"On average, how many cigarettes do you smoke per day now? (There are 20 cigarettes in a pack.)",0,1,,1586159,Measurement
+316515,316373,PPI,,Smoking_CurrentDailyCigaretteNumberDontKnow,Don't Know,0,1,,1586160,Observation
+316516,316373,PPI,,Smoking_CurrentDailyCigaretteNumberPreferNo,Prefer not to answer,0,1,,903063,Observation
+316517,316373,PPI,,Smoking_CurrentDailyCigaretteNumberPreferNotToAnsw,Prefer not to answer,0,1,,1586161,Observation
+316518,316373,PPI,,Smoking_DailySmokeStartingAge,How old were you when you first started regular cigarette smoking every day?,0,1,,1585864,Measurement
+316519,316373,PPI,,Smoking_DailySmokeStartingAgeDontKnow,Don't Know,0,1,,1585865,Observation
+316520,316373,PPI,,Smoking_DailySmokeStartingAgePreferNotToAnswer,Prefer not to answer,0,1,,1585866,Observation
+316521,316373,PPI,,Smoking_ElectronicSmoking,Electronic Smoking,0,0,,1586165,Observation
+316522,316373,PPI,,Smoking_HookahSmoking,Hookah Smoking,0,0,,1586181,Observation
+316523,316373,PPI,,Smoking_NumberOfYears,How many years have you or did you smoke cigarettes?,0,1,,1585873,Measurement
+316524,316373,PPI,,Smoking_NumberOfYearsDontKnow,Don't Know,0,1,,1586157,Observation
+316525,316373,PPI,,Smoking_NumberOfYearsPreferNotToKnow,Prefer not to answer,0,1,,1586158,Observation
+316526,316373,PPI,,Smoking_SeriousQuitAttempt,"In the past, have you ever made a serious attempt to quit smoking? That is, have you stopped smoking for at least one day or longer because you were trying to quit?",0,1,,1585867,Measurement
+316527,316373,PPI,,Smoking_SmokeFrequency,"Do you now smoke cigarettes every day, some days, or not at all?",0,1,,1585860,Measurement
+316528,316373,PPI,,Smoking_SmokelessTobacco,Smokeless Tobacco,0,0,,1586189,Observation
+316529,316412,PPI,,SocialSecurity_SocialSecurityNumber,What is your Social Security Number,0,1,,1585950,Observation
+316530,316352,PPI,,SouthCarolinaSitePairing_EauClaire,Are you currently a patient at any of the following Eau Claire clinics or health centers? Waverly Family Practice Pelion Family Practice,0,1,,1585586,Observation
+316531,316352,PPI,,SouthCarolinaSitePairing_EauClaireAppointment,Have you already scheduled an appointment with the All of Us Research Program team?,0,1,,1585589,Observation
+316532,316353,PPI,,TennesseeSitePairing_CherokeeHealthPatient,Are you a Cherokee Health Systems patient?,0,1,,1585572,Observation
+316533,316354,PPI,,TexasSitePairing_BaylorScott,Have you ever received care at any Baylor Scott & White Healthcare and/or Health Texas Provider Network facility such as: BSWH hospitals BSWH Urgent care centers BSWH Emergency rooms Hillcrest Health Clinics Health Texas Physician Network (HTPN) clinic...,0,1,,1585523,Observation
+316534,316355,PPI,,WesternMichiganSitePairing_SpectrumHealth,"Have you ever received care at a Spectrum Health System facility or are you currently affiliated with the system? This may include receiving care in a Spectrum hospital, urgent care, emergency department, outpatient clinic or through employee health",0,1,,903059,Observation
+316535,316355,PPI,,WesternMichiganSitePairing_SpectrumHealthSitePairi,"Have you ever received care at a Spectrum Health System facility or are you currently affiliated with the system? This may include receiving care in a Spectrum hospital, urgent care, emergency department, outpatient clinic or through employee health ...",0,1,,1585547,Observation
+316536,316370,PPI,,YoutubeVideos_RiskToPrivacy,risk to privacy,0,1,,1586133,Observation
+316537,316370,PPI,,YoutubeVideos_WhatAreWeAsking,what are we asking you to do?,0,1,,1586132,Observation
+316538,316513,PPI,,CigarSmoking_CigarSmokeParticipant,"Have you ever smoked a traditional cigar, cigarillo, or filtered cigar, even one or two puffs?",0,1,,1586174,Observation
+316539,316513,PPI,,CigarSmoking_CurrentCigarFrequency,"Do you now smoke a traditional cigar, cigarillo, or filtered cigar?",0,1,,1586177,Observation
+316540,316466,PPI,,EastSoutheastMichigan_CareAtHenryFord,"Have you ever received care at a Henry Ford Health System facility or are you currently affiliated with the institution? This many include receiving care in a HFHS hospital, urgent care, emergency department, outpatient clinic or thru HFHS employee hea...",0,1,,1585568,Observation
+316541,316521,PPI,,ElectronicSmoking_ElectricSmokeFrequency,Do you now use electronic nicotine productsâŠ,0,1,,1586169,Observation
+316542,316521,PPI,,ElectronicSmoking_ElectricSmokeParticipant,"Have you ever used an electronic nicotine product, even one or two times? (Electronic nicotine products include e-cigarettes, vape pens, hookah pens, personal vaporizers and mods, e-cigars, e-pipes, and e-hookahs.)",0,1,,1586166,Observation
+316543,316425,PPI,,EmploymentWorkAddress_AddressLineOne,Address Line 1,0,1,,1585962,Observation
+316544,316425,PPI,,EmploymentWorkAddress_AddressLineTwo,Address Line 2 (optional),0,1,,1585963,Observation
+316545,316425,PPI,,EmploymentWorkAddress_City,City,0,1,,1585964,Observation
+316546,316425,PPI,,EmploymentWorkAddress_Country,Country,0,1,,1585967,Measurement
+316547,316425,PPI,,EmploymentWorkAddress_State,State,0,1,,1585965,Observation
+316548,316425,PPI,,EmploymentWorkAddress_ZipCode,Zip-Code,0,1,,1585966,Observation
+316549,316453,PPI,,GenderIdentity_SexualityCloserDescription,Are any of these a closer description of how you think of yourself?,0,1,,1585357,Observation
+316550,316457,PPI,,HealthInsurance_HealthInsuranceType,"What kind of health insurance or health care coverage do you have? Include those that pay for only one type of service (nursing home care, accidents, or dental care). Exclude private plans that only provide extra cash while hospitalized. If you have mo...",0,1,,1585389,Measurement
+316551,316522,PPI,,HookahSmoking_CurrentHookahFrequency,Do you now smoke hookahâŠ,0,1,,1586185,Observation
+316552,316522,PPI,,HookahSmoking_HookahSmokeParticipant,"Have you ever smoked tobacco in a hookah, even one or two puffs?",0,1,,1586182,Observation
+316553,316487,PPI,,Past3MonthUseFrequency_Cocaine3MonthUse,"In the PAST THREE MONTHS, how often have you used Cocaine (coke, crack, etc.)",0,1,,1585656,Observation
+316554,316487,PPI,,Past3MonthUseFrequency_Hallucinogen3MonthUse,"In the PAST THREE MONTHS, how often have you used Hallucinogens (LSD, acid, mushrooms, PCP, Special K, ecstasy, etc.)",0,1,,1585686,Observation
+316555,316487,PPI,,Past3MonthUseFrequency_Inhalant3MonthUse,"In the PAST THREE MONTHS, how often have you used Inhalants (nitrous oxide, glue, gas, paint thinner, etc.)",0,1,,1585674,Observation
+316556,316487,PPI,,Past3MonthUseFrequency_Marijuana3MonthUse,"In the PAST THREE MONTHS, how often have you used Marijuana (cannabis, pot, grass, hash, weed, etc.)",0,1,,1585650,Observation
+316557,316487,PPI,,Past3MonthUseFrequency_Other3MonthUse,"In the PAST THREE MONTHS, how often have you used Other [INSERT LANGUAGE FROM SU01j]",0,1,,1585704,Observation
+316558,316487,PPI,,Past3MonthUseFrequency_OtherStimulant3MonthUse,"In the PAST THREE MONTHS, how often have you used Other stimulants (methamphetamine, speed, crystal meth, ice, k2/spice, bath salts, etc.)",0,1,,1585668,Observation
+316559,316487,PPI,,Past3MonthUseFrequency_PrescriptionOpiod3MonthUse,"In the PAST THREE MONTHS, how often have you used Prescription opioids for non-medical reasons (obana, fentanyl, oxycodone [OxyContin, Percocet], hydrocodone [Vicodin], methadone, buprenorphine [Supoxone], etc.)",0,1,,1585698,Observation
+316560,316487,PPI,,Past3MonthUseFrequency_PrescriptionStimulant3Month,"In the PAST THREE MONTHS, how often have you used Prescription stimulants for non-medical reasons (Vyvanse, Ritalin, Concerta, Dexedrine, Adderall, diet pills, etc.)",0,1,,1585662,Observation
+316561,316487,PPI,,Past3MonthUseFrequency_Sedative3MonthUse,"In the PAST THREE MONTHS, how often have you used Sedatives or sleeping pills for non-medical reasons (Valium, Serepax, Ativan, Xanax, Librium, Rohypnol, GHB, etc.)",0,1,,1585680,Observation
+316562,316487,PPI,,Past3MonthUseFrequency_Stimulant3MonthUse,"In the PAST THREE MONTHS, how often have you used Prescription stimulants for non-medical reasons (Vyvanse, Ritalin, Concerta, Dexedrine, Adderall, diet pills, etc.)",0,1,,903058,Observation
+316563,316487,PPI,,Past3MonthUseFrequency_StreetOpioid3MonthUse,"In the PAST THREE MONTHS, how often have you used Street opioids (heroin, opium, etc.)",0,1,,1585692,Observation
+316564,316528,PPI,,SmokelessTobacco_SmokelessTobaccoFrequency,Do you now use smokeless tobacco productsâŠ,0,1,,1586193,Observation
+316565,316528,PPI,,SmokelessTobacco_SmokelessTobaccoParticipant,"Have you ever used smokeless tobacco products, even one or two times? (Smokeless tobacco products include snus pouches, Skoal Bandits, loose snus, moist snuff, dip, spit, and chewing tobacco.)",0,1,,1586190,Observation
+316566,316477,PPI,,StreetAddress_PIICity,City,0,1,,1585248,Observation
+316567,316477,PPI,,StreetAddress_PIIState,State,0,1,,1585249,Observation
+316568,316477,PPI,,StreetAddress_PIIZIP,ZIP,0,1,,1585250,Observation
+316569,316486,PPI,,WhatRaceEthnicity_WhatTribeAffiliation,What Tribe,0,0,,1586139,Observation
+316570,316569,PPI,,WhatTribeAffiliation_FreeText,"Provide the name of the tribe in which you are enrolled or affiliated or your tribal descent. (for example, Navajo Nation, Blackfeet Tribe, Mayan, Aztec, Native Village of Barrow Inupiat Traditional Government, Nome Eskimo Community, etc.)",0,1,,1585599,Observation

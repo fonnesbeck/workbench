@@ -12,9 +12,10 @@ def swagger_regen()
       java -jar #{Workbench::Swagger::SWAGGER_CODEGEN_CLI_JAR}
       generate --lang python --input-spec #{Workbench::Swagger::SWAGGER_SPEC} --output py/tmp}
   file_opts = {:verbose => true}
-  FileUtils.rm_rf('py/aou_workbench_client/swagger_client', file_opts)
+  FileUtils.rm_rf('py/aou_workbench_client_new', file_opts)
   FileUtils.rm_rf('py/swagger_docs', file_opts)
-  FileUtils.mv('py/tmp/swagger_client', 'py/aou_workbench_client/', file_opts)
+  FileUtils.mkdir("py/aou_workbench_client_new")
+  FileUtils.mv('py/tmp/swagger_client', 'py/aou_workbench_client_new/', file_opts)
   FileUtils.mv('py/tmp/docs', 'py/swagger_docs', file_opts)
   FileUtils.mv('py/tmp/README.md', 'py/README.swagger.md', file_opts)
   FileUtils.mv('py/tmp/requirements.txt', 'py/swagger-requirements.txt', file_opts)
@@ -34,7 +35,7 @@ def install_py_requirements()
 end
 
 def pylint()
-  py_module_root = File.join(Workbench::WORKBENCH_ROOT, 'client', 'py', 'aou_workbench_client')
+  py_module_root = File.join(Workbench::WORKBENCH_ROOT, 'client', 'py', 'aou_workbench_client_new')
   rc_file_path = File.join(Workbench::WORKBENCH_ROOT, 'libproject', 'pylintrc')
 
   # As well as the client Python module, lint setup.py and other support files.

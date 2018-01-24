@@ -18,7 +18,7 @@ with open(os.path.join(client_dir, 'swagger-requirements.txt')) as swagger_requi
 
 setup(
         # This is what people 'pip install'.
-        name='aou-workbench-client',
+        name='aou-workbench-client-new',
 
         # TODO(markfickett) Automatically provide a version string here, bumped when publishing
         # (maybe from swagger-regen).

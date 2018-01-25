@@ -1,18 +1,21 @@
 package org.pmiops.workbench.api;
 
+import com.google.apphosting.api.ApiProxy;
+import com.google.cloud.storage.Blob;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Provider;
 import org.json.JSONObject;
@@ -30,6 +33,7 @@ import org.pmiops.workbench.exceptions.ConflictException;
 import org.pmiops.workbench.exceptions.ExceptionUtils;
 import org.pmiops.workbench.exceptions.ForbiddenException;
 import org.pmiops.workbench.exceptions.NotFoundException;
+import org.pmiops.workbench.exceptions.ServerErrorException;
 import org.pmiops.workbench.firecloud.FireCloudService;
 import org.pmiops.workbench.google.CloudStorageService;
 import org.pmiops.workbench.model.Authority;
@@ -37,10 +41,12 @@ import org.pmiops.workbench.model.CloneWorkspaceRequest;
 import org.pmiops.workbench.model.CloneWorkspaceResponse;
 import org.pmiops.workbench.model.DataAccessLevel;
 import org.pmiops.workbench.model.EmptyResponse;
+import org.pmiops.workbench.model.FileDetail;
 import org.pmiops.workbench.model.ResearchPurpose;
 import org.pmiops.workbench.model.ResearchPurposeReviewRequest;
 import org.pmiops.workbench.model.ShareWorkspaceRequest;
 import org.pmiops.workbench.model.ShareWorkspaceResponse;
+import org.pmiops.workbench.model.UpdateWorkspaceRequest;
 import org.pmiops.workbench.model.UserRole;
 import org.pmiops.workbench.model.Workspace;
 import org.pmiops.workbench.model.WorkspaceAccessLevel;
@@ -223,7 +229,7 @@ public class WorkspacesController implements WorkspacesApiDelegate {
   private final WorkspaceService workspaceService;
   private final CdrVersionDao cdrVersionDao;
   private final UserDao userDao;
-  private final Provider<User> userProvider;
+  private Provider<User> userProvider;
   private final FireCloudService fireCloudService;
   private final CloudStorageService cloudStorageService;
   private final Clock clock;
@@ -250,6 +256,11 @@ public class WorkspacesController implements WorkspacesApiDelegate {
     this.clock = clock;
     this.apiHostName = apiHostName;
     this.workbenchConfigProvider = workbenchConfigProvider;
+  }
+
+  @VisibleForTesting
+  void setUserProvider(Provider<User> userProvider) {
+    this.userProvider = userProvider;
   }
 
   private static String generateRandomChars(String candidateChars, int length) {
@@ -302,36 +313,6 @@ public class WorkspacesController implements WorkspacesApiDelegate {
       strippedName = generateRandomChars(RANDOM_CHARS, NUM_RANDOM_CHARS);
     }
     return new FirecloudWorkspaceId(namespace, strippedName);
-  }
-
-  private void checkWorkspaceWriteAccess(String workspaceNamespace, String workspaceId) {
-    WorkspaceAccessLevel userAccess = getWorkspaceAccessLevel(workspaceNamespace, workspaceId);
-    if (!(WorkspaceAccessLevel.OWNER.equals(userAccess) ||
-          WorkspaceAccessLevel.WRITER.equals(userAccess))) {
-      throw new ForbiddenException(String.format("Insufficient permissions to edit workspace %s/%s",
-          workspaceNamespace, workspaceId));
-    }
-  }
-
-  private void checkWorkspaceReadAccess(String workspaceNamespace, String workspaceId) {
-    WorkspaceAccessLevel userAccess = getWorkspaceAccessLevel(workspaceNamespace, workspaceId);
-    if (!(WorkspaceAccessLevel.OWNER.equals(userAccess) ||
-          WorkspaceAccessLevel.WRITER.equals(userAccess) ||
-          WorkspaceAccessLevel.READER.equals(userAccess))) {
-      throw new ForbiddenException(String.format("Insufficient permissions to read workspace %s/%s",
-          workspaceNamespace, workspaceId));
-    }
-  }
-
-  private WorkspaceAccessLevel getWorkspaceAccessLevel(String workspaceNamespace, String workspaceId) {
-    String userAccess;
-    try {
-      userAccess = fireCloudService.getWorkspace(
-          workspaceNamespace, workspaceId).getAccessLevel();
-    } catch (org.pmiops.workbench.firecloud.ApiException e) {
-      throw ExceptionUtils.convertFirecloudException(e);
-    }
-    return WorkspaceAccessLevel.fromValue(userAccess);
   }
 
   private org.pmiops.workbench.firecloud.model.Workspace
@@ -456,12 +437,45 @@ public class WorkspacesController implements WorkspacesApiDelegate {
     org.pmiops.workbench.db.model.Workspace dbWorkspace = workspaceService.getRequired(
         workspaceNamespace, workspaceId);
     try {
+      // This automatically handles access control to the workspace.
       fireCloudService.deleteWorkspace(workspaceNamespace, workspaceId);
     } catch (org.pmiops.workbench.firecloud.ApiException e) {
       throw ExceptionUtils.convertFirecloudException(e);
     }
     workspaceService.getDao().delete(dbWorkspace);
     return ResponseEntity.ok(new EmptyResponse());
+  }
+
+  @Override
+  public ResponseEntity<List<FileDetail>> getNoteBookList(String workspaceNamespace,
+      String workspaceId) {
+    List<Blob> blobList = new ArrayList<>();
+    List<FileDetail> fileList = new ArrayList<>();
+    try {
+      org.pmiops.workbench.firecloud.model.Workspace fireCloudWorkspace =
+          fireCloudService.getWorkspace(workspaceNamespace, workspaceId)
+              .getWorkspace();
+      String bucketName = fireCloudWorkspace.getBucketName();
+      blobList = cloudStorageService.getBlobList(bucketName, "notebook");
+      if (blobList != null && blobList.size() > 0) {
+        blobList.stream()
+            .filter(blob ->
+                blob.getName().matches("([^\\s]+(\\.(?i)(ipynb))$)"))
+            .forEach(blob -> {
+              FileDetail fileDetail = new FileDetail();
+              fileDetail.setName(blob.getName());
+              fileDetail.setPath("gs://" + bucketName + "/" + blob.getName());
+              fileList.add(fileDetail);
+            });
+      }
+    } catch (org.pmiops.workbench.firecloud.ApiException e) {
+      if (e.getCode() == 404) {
+        throw new NotFoundException(String.format("Workspace %s/%s not found",
+            workspaceNamespace, workspaceId));
+      }
+      throw new ServerErrorException(e);
+    }
+    return ResponseEntity.ok(fileList);
   }
 
   @Override
@@ -474,6 +488,7 @@ public class WorkspacesController implements WorkspacesApiDelegate {
     WorkspaceResponse response = new WorkspaceResponse();
 
     try {
+      // This enforces access controls.
       fcResponse = fireCloudService.getWorkspace(
           workspaceNamespace, workspaceId);
       fcWorkspace = fcResponse.getWorkspace();
@@ -508,11 +523,15 @@ public class WorkspacesController implements WorkspacesApiDelegate {
 
   @Override
   public ResponseEntity<Workspace> updateWorkspace(String workspaceNamespace, String workspaceId,
-      Workspace workspace) {
+      UpdateWorkspaceRequest request) {
     org.pmiops.workbench.db.model.Workspace dbWorkspace = workspaceService.getRequired(
         workspaceNamespace, workspaceId);
-    checkWorkspaceWriteAccess(workspaceNamespace, workspaceId);
-
+    workspaceService.enforceWorkspaceAccessLevel(workspaceNamespace,
+        workspaceId, WorkspaceAccessLevel.WRITER);
+    Workspace workspace = request.getWorkspace();
+    if (workspace == null) {
+      throw new BadRequestException("No workspace provided in request");
+    }
     if (Strings.isNullOrEmpty(workspace.getEtag())) {
       throw new BadRequestException("Missing required update field 'etag'");
     }
@@ -556,8 +575,8 @@ public class WorkspacesController implements WorkspacesApiDelegate {
           workspace.getNamespace(), workspace.getName()));
     }
 
-    checkWorkspaceReadAccess(workspaceNamespace, workspaceId);
-    org.pmiops.workbench.db.model.Workspace fromWorkspace = workspaceService.getRequired(
+    workspaceService.enforceWorkspaceAccessLevel(workspaceNamespace, workspaceId, WorkspaceAccessLevel.READER);
+    org.pmiops.workbench.db.model.Workspace fromWorkspace = workspaceService.getRequiredWithCohorts(
         workspaceNamespace, workspaceId);
     if (fromWorkspace == null) {
       throw new NotFoundException(String.format(
@@ -600,7 +619,6 @@ public class WorkspacesController implements WorkspacesApiDelegate {
       dbWorkspace.setDescription(toWorkspace.getDescription());
     }
 
-    // TODO(calbach): Copy cohorts.
     dbWorkspace.setCdrVersion(fromWorkspace.getCdrVersion());
     dbWorkspace.setDataAccessLevel(fromWorkspace.getDataAccessLevel());
 
@@ -611,7 +629,7 @@ public class WorkspacesController implements WorkspacesApiDelegate {
 
     dbWorkspace.addWorkspaceUserRole(permissions);
 
-    dbWorkspace = workspaceService.getDao().save(dbWorkspace);
+    dbWorkspace = workspaceService.saveAndCloneCohorts(fromWorkspace, dbWorkspace);
     CloneWorkspaceResponse resp = new CloneWorkspaceResponse();
     resp.setWorkspace(TO_CLIENT_WORKSPACE.apply(dbWorkspace));
     return ResponseEntity.ok(resp);
@@ -643,6 +661,7 @@ public class WorkspacesController implements WorkspacesApiDelegate {
       newUserRole.setRole(user.getRole());
       dbUserRoles.add(newUserRole);
     }
+    // This automatically enforces owner role.
     dbWorkspace = workspaceService.updateUserRoles(dbWorkspace, dbUserRoles);
     ShareWorkspaceResponse resp = new ShareWorkspaceResponse();
     resp.setWorkspaceEtag(Etags.fromVersion(dbWorkspace.getVersion()));

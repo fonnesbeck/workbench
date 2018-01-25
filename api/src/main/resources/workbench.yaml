@@ -65,7 +65,7 @@ parameters:
     description: Cohort ID
   cohortReviewId:
     in: path
-    name: cohortId
+    name: cohortReviewId
     type: integer
     format: int64
     required: true
@@ -395,7 +395,7 @@ paths:
           schema:
             $ref: '#/definitions/ErrorReport'
 
-  /v1/workspaces/{workspaceNamespace}/{workspaceId}/cluster/:
+  /v1/workspaces/{workspaceNamespace}/{workspaceId}/cluster:
     parameters:
       - $ref: '#/parameters/workspaceNamespace'
       - $ref: '#/parameters/workspaceId'
@@ -457,10 +457,10 @@ paths:
           schema:
             $ref: '#/definitions/ErrorReport'
 
-  /api/v1/workspaces/{workspaceNamespace}/{workspaceId}/notebook-list/:
+  /v1/workspaces/{workspaceNamespace}/{workspaceId}/notebook-list:
     get:
-      summary: Get details of Python files from google Bucket
-      description: Returns list of name and url of python files from google bucket.
+      summary: Get details of Python files from google Bucket directory notebook
+      description: Returns list of name and path of python files from google bucket, directory notebook.
       operationId: getNoteBookList
       tags:
         - workspaces
@@ -476,22 +476,22 @@ paths:
           required: true
           type: string
       responses:
-        "200":
+        200:
           description: List of files
           schema:
             type: array
             items:
               $ref: '#/definitions/FileDetail'
-        "404":
-          description: Google bucket not found
+        404:
+          description: Workspace not found
           schema:
             $ref: '#/definitions/ErrorReport'
-        "500":
+        500:
           description: Internal Error
           schema:
             $ref: '#/definitions/ErrorReport'
 
-  /api/v1/workspaces/{workspaceNamespace}/{workspaceId}/localize-notebook/:
+  /v1/workspaces/{workspaceNamespace}/{workspaceId}/localize-notebooks:
     post:
       summary: Localize files from workspace to notebook cluster
       description: localize files
@@ -518,17 +518,16 @@ paths:
           items:
             $ref: '#/definitions/FileDetail'
       responses:
-        "200":
-          description: List of files
-        "404":
-          description: Google bucket not found
-          schema:
-            $ref: '#/definitions/ErrorReport'
-        "500":
-          description: Internal Error
-          schema:
-            $ref: '#/definitions/ErrorReport'
-
+        200:
+         description: List of files
+        404:
+         description: Cluster or Workspace not found
+         schema:
+           $ref: '#/definitions/ErrorReport'
+        500:
+         description: Internal Error
+         schema:
+          $ref: '#/definitions/ErrorReport'
 
   # Billing projects #####################################################################
 
@@ -606,7 +605,7 @@ paths:
           name: workspace
           description: workspace definition
           schema:
-            $ref: "#/definitions/Workspace"
+            $ref: "#/definitions/UpdateWorkspaceRequest"
       responses:
         200:
           description: The updated workspace definition
@@ -1589,6 +1588,14 @@ definitions:
         $ref: "#/definitions/Workspace"
         description: The newly created workspace clone.
 
+  UpdateWorkspaceRequest:
+    type: object
+    required:
+     - workspace
+    properties:
+      workspace:
+        $ref: "#/definitions/Workspace"
+
   WorkspaceAccessLevel:
     type: string
     description: levels of access to workspace, NO ACCESS is akin to removing a user from a workspace ACL
@@ -2224,7 +2231,6 @@ definitions:
       sortColumn:
         type: string
 
-
   ParticipantCohortStatus:
     type: object
     required:
@@ -2236,6 +2242,24 @@ definitions:
         format: int64
       status:
         $ref: "#/definitions/CohortStatus"
+      genderConceptId:
+        type: integer
+        format: int64
+      gender:
+        type: string
+      birthDatetime:
+        type: integer
+        format: int64
+      raceConceptId:
+        type: integer
+        format: int64
+      race:
+        type: string
+      ethnicityConceptId:
+        type: integer
+        format: int64
+      ethnicity:
+        type: string
 
   CohortStatus:
     type: string
@@ -2299,7 +2323,7 @@ definitions:
   AnnotationType:
     type: string
     description: possible values representing the type of annotation.
-    enum: [STRING, BOOLEAN, INTEGER, DATE, TIMESTAMP]
+    enum: [STRING, ENUM, DATE, BOOLEAN, INTEGER]
 
   CohortAnnotationDefinition:
     type: object
@@ -2321,6 +2345,11 @@ definitions:
         description: the name of this annotation.
       annotationType:
         $ref: "#/definitions/AnnotationType"
+      enumValues:
+        type: array
+        items:
+          type: string
+
 
   ParticipantCohortAnnotation:
     type: object
@@ -2340,15 +2369,21 @@ definitions:
         type: integer
         format: int64
         description: the participant id.
-      annotationValueString:
+      valueString:
         type: string
-        description: the value of this annotation if the type is string
-      annotationValueInteger:
+        description: The Value of the annotation if the AnnotationType is STRING
+      valueEnum:
+        type: string
+        description: The option chosen for the annotation if the AnnotationType is ENUM
+      valueDate:
+        type: string
+        description: The Value of the annotation if the AnnotationType is DATE
+      valueBoolean:
+        type: boolean
+        description: The Value of the annotation if the AnnotationType is BOOLEAN
+      valueInteger:
         type: integer
-        description: the value of this annotation if the type in integer
-      annotationValueTimestamp:
-        type: string
-        description: the value of this annotation if the type is date/timestamp.
+        description: The Value of the annotation if the AnnotationType is INTEGER
 
   CohortAnnotationDefinitionListResponse:
     type: object
@@ -2382,15 +2417,21 @@ definitions:
   ModifyParticipantCohortAnnotationRequest:
     type: object
     properties:
-      annotationValueString:
+      valueString:
         type: string
-        description: the value of this annotation if the type is string
-      annotationValueInteger:
+        description: The Value of the annotation if the AnnotationType is STRING
+      valueEnum:
+        type: string
+        description: The option chosen for the annotation if the AnnotationType is ENUM
+      valueDate:
+        type: string
+        description: The Value of the annotation if the AnnotationType is DATE
+      valueBoolean:
+        type: boolean
+        description: The Value of the annotation if the AnnotationType is BOOLEAN
+      valueInteger:
         type: integer
-        description: the value of this annotation if the type in integer
-      annotationValueTimestamp:
-        type: string
-        description: the value of this annotation if the type is date/timestamp.
+        description: The Value of the annotation if the AnnotationType is INTEGER
 
   # Mirrors notebooks definitions ###############################################
   ErrorReport:
@@ -2474,8 +2515,6 @@ definitions:
         type: object
         description: The labels to be placed on the cluster. Of type Map[String,String]
 
-
-
   FileDetail:
     type: object
     required:
@@ -2484,8 +2523,10 @@ definitions:
     properties:
       name:
         type: string
+        description: File Name
       path:
         type: string
+        description: The path is in format of gs://bucket-name/name
 
   ClusterListResponse:
     type: object

@@ -1,12 +1,13 @@
 package org.pmiops.workbench.google;
 
 import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.StorageOptions;
-import java.util.Map;
-import java.util.Properties;
+import com.google.cloud.storage.Storage;
+import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Provider;
 import org.pmiops.workbench.config.WorkbenchConfig;
 import org.pmiops.workbench.model.FileDetail;
@@ -35,17 +36,11 @@ public class CloudStorageServiceImpl implements CloudStorageService {
   }
 
   @Override
-  public List<FileDetail> getBucketFileList(String bucketName) {
-    List<FileDetail> fileList = new ArrayList<FileDetail>();
+  public List<Blob> getBlobList(String bucketName, String directory) {
     Storage storage = StorageOptions.getDefaultInstance().getService();
-    Iterable<Blob> blobList =storage.get(bucketName).list().getValues();
-    blobList.forEach(blobItem->{
-      FileDetail fileDetail = new FileDetail();
-      fileDetail.setName(blobItem.getName());
-      fileDetail.setPath("gs://"+bucketName+"/"+blobItem.getName());
-      fileList.add(fileDetail);
-    });
-    return fileList;
+    Iterable<Blob> blobList = storage.get(bucketName)
+        .list(Storage.BlobListOption.prefix(directory)).getValues();
+    return ImmutableList.copyOf(blobList);
   }
 
   String getCredentialsBucketName() {

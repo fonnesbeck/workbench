@@ -1,8 +1,7 @@
 package org.pmiops.workbench.notebooks;
 
-
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Provider;
 
 import org.pmiops.workbench.db.model.User;
@@ -71,13 +70,8 @@ public class NotebooksServiceImpl implements NotebooksService {
   }
 
   @Override
-  public void localize(String googleProject,String clusterName,HashMap fileList) throws ApiException {
+  public void localize(String googleProject, String clusterName, Map fileList) throws ApiException {
     ClusterApi clusterApi = clusterApiProvider.get();
-    try{
-      clusterApi.localizeFiles(googleProject,clusterName,fileList);
-    } catch (ApiException e) {
-      throw new RuntimeException(e);
-    }
-
+    clusterApi.localizeFiles(googleProject, clusterName, fileList);
   }
 }

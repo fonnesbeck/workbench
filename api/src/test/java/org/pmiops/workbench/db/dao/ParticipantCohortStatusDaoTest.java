@@ -1,7 +1,5 @@
 package org.pmiops.workbench.db.dao;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,9 +19,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@Import(LiquibaseAutoConfiguration.class)
+@Import({LiquibaseAutoConfiguration.class})
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
 public class ParticipantCohortStatusDaoTest {
@@ -39,10 +43,21 @@ public class ParticipantCohortStatusDaoTest {
     public void onSetup() {
         ParticipantCohortStatusKey key1 = new ParticipantCohortStatusKey().cohortReviewId(COHORT_REVIEW_ID).participantId(1);
         ParticipantCohortStatusKey key2 = new ParticipantCohortStatusKey().cohortReviewId(COHORT_REVIEW_ID).participantId(2);
-        participant1 = new ParticipantCohortStatus().participantKey(key1).status(CohortStatus.INCLUDED);
-        participant2 = new ParticipantCohortStatus().participantKey(key2).status(CohortStatus.EXCLUDED);
-        participantCohortStatusDao.save(participant2);
-        participantCohortStatusDao.save(participant1);
+        participant1 = new ParticipantCohortStatus()
+                .participantKey(key1)
+                .status(CohortStatus.INCLUDED)
+                .birthDate(new Date(System.currentTimeMillis()))
+                .ethnicityConceptId(1L)
+                .genderConceptId(1L)
+                .raceConceptId(1L);
+        participant2 = new ParticipantCohortStatus()
+                .participantKey(key2)
+                .status(CohortStatus.EXCLUDED)
+                .birthDate(new Date(System.currentTimeMillis()))
+                .ethnicityConceptId(1L)
+                .genderConceptId(1L)
+                .raceConceptId(1L);
+        participantCohortStatusDao.save(Arrays.asList(participant1, participant2));
     }
 
     @After
@@ -79,6 +94,31 @@ public class ParticipantCohortStatusDaoTest {
                         COHORT_REVIEW_ID,
                         participant1.getParticipantKey().getParticipantId()
                 ));
+    }
+
+    @Test
+    public void saveParticipantCohortStatuses() throws Exception {
+        ParticipantCohortStatusKey key1 = new ParticipantCohortStatusKey().cohortReviewId(2).participantId(3);
+        ParticipantCohortStatusKey key2 = new ParticipantCohortStatusKey().cohortReviewId(2).participantId(4);
+        ParticipantCohortStatus pcs1 = new ParticipantCohortStatus()
+                .participantKey(key1)
+                .status(CohortStatus.INCLUDED)
+                .birthDate(new Date(System.currentTimeMillis()))
+                .ethnicityConceptId(1L)
+                .genderConceptId(1L)
+                .raceConceptId(1L);
+        ParticipantCohortStatus pcs2 = new ParticipantCohortStatus()
+                .participantKey(key2)
+                .status(CohortStatus.EXCLUDED)
+                .birthDate(new Date(System.currentTimeMillis()))
+                .ethnicityConceptId(1L)
+                .genderConceptId(1L)
+                .raceConceptId(1L);
+
+        participantCohortStatusDao.saveParticipantCohortStatusesCustom(Arrays.asList(pcs1, pcs2));
+        List<ParticipantCohortStatus> pcdList =
+                participantCohortStatusDao.findByParticipantKey_CohortReviewId(2, new PageRequest(0, 10)).getContent();
+        assertEquals(2, pcdList.size());
     }
 
     private void assertParticipant(Pageable pageRequest, ParticipantCohortStatus expectedParticipant) {

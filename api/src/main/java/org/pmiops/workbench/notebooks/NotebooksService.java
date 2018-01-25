@@ -1,8 +1,7 @@
 package org.pmiops.workbench.notebooks;
 
-import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import org.pmiops.workbench.notebooks.model.Cluster;
 import org.pmiops.workbench.notebooks.model.ClusterRequest;
 
@@ -38,5 +37,5 @@ public interface NotebooksService {
   /**
    * Send files over to notebook Cluster
    */
-  void localize(String googleProject,String clusterName,HashMap fileList) throws ApiException;
+  void localize(String googleProject, String clusterName, Map fileList) throws ApiException;
 }

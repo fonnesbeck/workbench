@@ -4,8 +4,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.pmiops.workbench.cdr.cache.GenderRaceEthnicityConcept;
 import org.pmiops.workbench.db.dao.CohortDao;
 import org.pmiops.workbench.db.dao.CohortReviewDao;
 import org.pmiops.workbench.db.dao.ParticipantCohortStatusDao;
@@ -13,14 +13,12 @@ import org.pmiops.workbench.db.dao.WorkspaceService;
 import org.pmiops.workbench.db.model.Cohort;
 import org.pmiops.workbench.db.model.CohortReview;
 import org.pmiops.workbench.db.model.ParticipantCohortStatus;
-import org.pmiops.workbench.db.model.ParticipantCohortStatusKey;
 import org.pmiops.workbench.db.model.Workspace;
 import org.pmiops.workbench.exceptions.NotFoundException;
+import org.pmiops.workbench.model.WorkspaceAccessLevel;
 import org.springframework.data.domain.PageRequest;
 
-import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.List;
+import javax.inject.Provider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -42,7 +40,7 @@ public class CohortReviewServiceImplTest {
     private WorkspaceService workspaceService;
 
     @Mock
-    private EntityManager entityManager;
+    private Provider<GenderRaceEthnicityConcept> genderRaceEthnicityConceptProvider;
 
     @InjectMocks
     private CohortReviewServiceImpl cohortReviewService;
@@ -86,16 +84,19 @@ public class CohortReviewServiceImplTest {
 
         Workspace workspace = new Workspace();
         workspace.setWorkspaceId(badWorkspaceId);
+        WorkspaceAccessLevel owner = WorkspaceAccessLevel.OWNER;
+
+        when(workspaceService.enforceWorkspaceAccessLevel(workspaceNamespace, workspaceName, WorkspaceAccessLevel.READER)).thenReturn(owner);
         when(workspaceService.getRequired(workspaceNamespace, workspaceName)).thenReturn(workspace);
 
         try {
-            cohortReviewService.validateMatchingWorkspace(workspaceNamespace, workspaceName, workspaceId);
+            cohortReviewService.validateMatchingWorkspace(workspaceNamespace, workspaceName, workspaceId, WorkspaceAccessLevel.READER);
             fail("Should have thrown NotFoundException!");
         } catch (NotFoundException e) {
             assertEquals("Not Found: No workspace matching workspaceNamespace: "
                     + workspaceNamespace + ", workspaceId: " + workspaceName, e.getMessage());
         }
-
+        verify(workspaceService).enforceWorkspaceAccessLevel(workspaceNamespace, workspaceName, WorkspaceAccessLevel.READER);
         verify(workspaceService).getRequired(workspaceNamespace, workspaceName);
         verifyNoMoreMockInteractions();
     }
@@ -108,10 +109,14 @@ public class CohortReviewServiceImplTest {
 
         Workspace workspace = new Workspace();
         workspace.setWorkspaceId(workspaceId);
+        WorkspaceAccessLevel owner = WorkspaceAccessLevel.OWNER;
+
+        when(workspaceService.enforceWorkspaceAccessLevel(workspaceNamespace, workspaceName, WorkspaceAccessLevel.READER)).thenReturn(owner);
         when(workspaceService.getRequired(workspaceNamespace, workspaceName)).thenReturn(workspace);
 
-        cohortReviewService.validateMatchingWorkspace(workspaceNamespace, workspaceName, workspaceId);
+        cohortReviewService.validateMatchingWorkspace(workspaceNamespace, workspaceName, workspaceId, WorkspaceAccessLevel.READER);
 
+        verify(workspaceService).enforceWorkspaceAccessLevel(workspaceNamespace, workspaceName, WorkspaceAccessLevel.READER);
         verify(workspaceService).getRequired(workspaceNamespace, workspaceName);
         verifyNoMoreMockInteractions();
     }
@@ -197,25 +202,6 @@ public class CohortReviewServiceImplTest {
     }
 
     @Test
-    public void saveParticipantCohortStatuses() throws Exception {
-        Whitebox.setInternalState(cohortReviewService, "entityManager", entityManager);
-        Whitebox.setInternalState(cohortReviewService, "batchSize", 50);
-
-        List<ParticipantCohortStatus> pcsList = new ArrayList<>();
-        final ParticipantCohortStatus participantCohortStatus = new ParticipantCohortStatus();
-        ParticipantCohortStatusKey key = new ParticipantCohortStatusKey(1, 1);
-        participantCohortStatus.setParticipantKey(key);
-        pcsList.add(participantCohortStatus);
-
-        doNothing().when(entityManager).persist(participantCohortStatus);
-
-        cohortReviewService.saveParticipantCohortStatuses(pcsList);
-
-        verify(entityManager).persist(participantCohortStatus);
-        verifyNoMoreMockInteractions();
-    }
-
-    @Test
     public void saveParticipantCohortStatus() throws Exception {
         ParticipantCohortStatus pcs = new ParticipantCohortStatus();
 
@@ -291,7 +277,11 @@ public class CohortReviewServiceImplTest {
     }
 
     private void verifyNoMoreMockInteractions() {
-        verifyNoMoreInteractions(cohortDao, cohortReviewDao, participantCohortStatusDao, workspaceService);
+        verifyNoMoreInteractions(
+                cohortDao,
+                cohortReviewDao,
+                participantCohortStatusDao,
+                workspaceService);
     }
 
 }

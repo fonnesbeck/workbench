@@ -21,8 +21,7 @@ import {
 
 
 class Notebook {
-  constructor(public name: string, public description: string, public path: string,
-              public push: boolean) {}
+  constructor(public name: string, public path: string, public selected: boolean) {}
 }
 /*
 * Search filters used by the cohort and notebook data tables to
@@ -44,11 +43,7 @@ class NotebookNameFilter implements StringFilter<Notebook> {
     return notebook.name.toLowerCase().indexOf(search) >= 0;
   }
 }
-class NotebookDescriptionFilter implements StringFilter<Notebook> {
-  accepts(notebook: Notebook, search: string): boolean {
-    return notebook.description.toLowerCase().indexOf(search) >= 0;
-  }
-}
+
 /*
 * Sort comparators used by the cohort and notebook data tables to
 * determine the order that the cohorts loaded into client side memory
@@ -69,11 +64,6 @@ class NotebookNameComparator implements Comparator<Notebook> {
     return a.name.localeCompare(b.name);
   }
 }
-class NotebookDescriptionComparator implements Comparator<Notebook> {
-  compare(a: Notebook, b: Notebook) {
-    return a.description.localeCompare(b.description);
-  }
-}
 
 
 @Component({
@@ -87,11 +77,9 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   private cohortNameFilter = new CohortNameFilter();
   private cohortDescriptionFilter = new CohortDescriptionFilter();
   private notebookNameFilter = new NotebookNameFilter();
-  private notebookDescriptionFilter = new NotebookDescriptionFilter();
   private cohortNameComparator = new CohortNameComparator();
   private cohortDescriptionComparator = new CohortDescriptionComparator();
   private notebookNameComparator = new NotebookNameComparator();
-  private notebookDescriptionComparator = new NotebookDescriptionComparator();
   /* tslint:enable:no-unused-variable */
 
   workspace: Workspace;
@@ -100,7 +88,9 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   workspaceLoading = true;
   cohortsLoading = true;
   cohortsError = false;
+  notebookError = false;
   notebooksLoading = false;
+  checkColumnNotebook = false;
   cohortList: Cohort[] = [];
   cluster: Cluster;
   clusterPulled = false;
@@ -108,9 +98,8 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   notFound = false;
   private accessLevel: WorkspaceAccessLevel;
   deleting = false;
-  saveSuccess = false;
-  saveError = false;
-  notebookSelected = false;
+  showAlerts = false;
+  enablePushNotebookBtn = false;
   // TODO: Replace with real data/notebooks read in from GCS
   notebookList: Notebook[] = [];
   editHover = false;
@@ -118,6 +107,8 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   trashHover = false;
   listenerAdded = false;
   notebookAuthListener: EventListenerOrEventListenerObject;
+  alertCategory: string;
+  alertMsg: string;
 
   constructor(
       private route: ActivatedRoute,
@@ -160,19 +151,15 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
             this.errorHandlingService.retryApi(this.workspacesService
               .getNoteBookList(this.wsNamespace, this.wsId))
                 .subscribe(
-                  FileList => {
-                    for (const fileDetail of FileList){
+                  fileList => {
+                    for (const fileDetail of fileList){
                       fileDetail.push = false;
                       this.notebookList.push(fileDetail);
-
                     }
                   },
                   error => {
-                    if (error.status === 404) {
-                      this.notFound = true;
-                    } else {
-                      this.workspaceLoading = false;
-                    }
+                    this.notebooksLoading = false;
+                    this.notebookError = false;
                   });
             },
           error => {
@@ -297,23 +284,26 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.router.navigate(['edit'], {relativeTo : this.route});
   }
 
+  clone(): void {
+    this.router.navigate(['clone'], {relativeTo : this.route});
+  }
+
   share(): void {
     this.router.navigate(['share'], {relativeTo : this.route});
   }
 
-  checkBoxEvent(notebook): void {
-    if (notebook.push === true) {
-      this.notebookSelected = true;
-    } else {
-        this.notebookSelected = false;
-        for (const file of this.notebookList){
-          if (file.push === true) {
-            this.notebookSelected = true;
-            break;
-          }
-        }
-    }
+  selectANotebook(): void {
+    this.checkColumnNotebook = this.notebookList.every(notebook => notebook.selected);
+    this.enablePushNotebookBtn = this.notebookList.some(notebook => notebook.selected);
   }
+
+  selectAllNoteBooks(): void {
+    for (const file of this.notebookList) {
+      file.selected = this.checkColumnNotebook;
+    }
+    this.enablePushNotebookBtn = this.checkColumnNotebook;
+  }
+
   delete(): void {
     this.deleting = true;
     this.workspacesService.deleteWorkspace(
@@ -331,20 +321,30 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     return this.accessLevel === WorkspaceAccessLevel.OWNER;
   }
 
-  pushToNotebookServer(notebook): void {
-    const fileList: Array<FileDetail> = [];
-    for (const file of notebook){
-      if (file.push) {
-        fileList.push(file);
-      }
-    }
+  localizeNotebooks(notebooks): void {
+    const fileList: Array<FileDetail> = notebooks.filter((item) => item.selected);
     this.clusterService
-    .localizeNotebook(this.workspace.namespace, this.workspace.id, fileList).subscribe( () => {
-      this.saveSuccess = true;
-      this.saveError = false;
-    }, () => {
-      this.saveError = true;
-      this.saveSuccess = false;
-    });
+        .localizeNotebook(this.workspace.namespace, this.workspace.id, fileList)
+        .subscribe(() => {
+          this.alertCategory = 'alert-success';
+          this.alertMsg = 'File(s) have been saved';
+          this.showAlerts = true;
+          setTimeout(() => {
+            this.resetAlerts();
+          }, 5000);
+        }, () => {
+          this.alertCategory = 'alert-danger';
+          this.alertMsg = 'There was an issue while saving file(s) please try again later';
+          this.showAlerts = true;
+          setTimeout(() => {
+            this.resetAlerts();
+          }, 5000);
+        });
+  }
+
+  resetAlerts(): void {
+    this.alertCategory = '';
+    this.alertMsg = '';
+    this.showAlerts = false;
   }
 }

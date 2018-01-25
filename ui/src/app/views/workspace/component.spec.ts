@@ -139,22 +139,12 @@ describe('WorkspaceComponent', () => {
   }));
 
   it('displays correct notebook information', fakeAsync(() => {
-    let noteBookSize: number;
-    workspacePage.workspacesService.getNoteBookList(
-    workspacePage.workspaceNamespace,
-    workspacePage.workspaceId).subscribe((noteBookList) => {
-      noteBookSize = noteBookList.length;
-    });
-    tick();
-    expect(noteBookSize).toBe(1);
-
-    workspacePage.workspacesService.getNoteBookList(
-      'MockNamespace',
-      workspacePage.workspaceId).subscribe((noteBookList) => {
-        noteBookSize = noteBookList.length;
-    });
-    tick();
-    expect(noteBookSize).toBe(0);
+    // Mock notebook service in workspace stub will be called as part of ngInit
+    const fixture = workspacePage.fixture;
+    const app = fixture.debugElement.componentInstance;
+    expect(app.notebookList.length).toEqual(1);
+    expect(app.notebookList[0].name).toEqual('FileDetails');
+    expect(app.notebookList[0].path).toEqual('gs://bucket/notebook/mockFile');
   }));
 
 

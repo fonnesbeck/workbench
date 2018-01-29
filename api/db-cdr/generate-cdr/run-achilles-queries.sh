@@ -316,7 +316,7 @@ where (extract(year from co1.procedure_date) - p1.year_of_birth) >= 18 and
 (extract(year from co1.procedure_date) - p1.year_of_birth) < 30
 group by co1.procedure_concept_id, stratum_2"
 
-# Drugs
+# Drug exposure s
 bq --quiet --project=$BQ_PROJECT query --nouse_legacy_sql \
 "insert into \`${WORKBENCH_PROJECT}.${WORKBENCH_DATASET}.achilles_results\`
 (id, analysis_id, stratum_1, count_value)

@@ -31,35 +31,49 @@ fi
 
 # variables
 tmp_dir="/tmp"
-cdr_schema_file="cdr_schema.sql"
-public_schema_file="public_schema.sql"
-hard_data_file="hard_data.sql"
-new_cdr_db_name="cdr$CDR_VERSION"
-copy_cdr_db_name="cdr$COPY_CDR_VERSION"
+cdr_schema_file="cdr${CDR_VERSION}_schema.sql"
+public_schema_file="public${CDR_VERSION}_schema.sql"
 
-echo "Making a copy of $copy_cdr_db_name to $new_cdr_db_name"
+# Overide this env for the one we are creating
+export CDR_DB_NAME="cdr$CDR_VERSION"
 
-# create new cdr database
-mysql -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} -e "drop database if exists $new_cdr_db_name"
-mysql -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} -e "create database $new_cdr_db_name"
+CREATE_DB_FILE=/tmp/create_db.sql
 
-# Dump copy cdr schema and import to new database
-echo "Dumping cdr schema "
-mysqldump -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} \
-    --no-data --add-drop-table --ignore-table=$copy_cdr_db_name.DATABASECHANGELOG \
-    --ignore-table=$copy_cdr_db_name.DATABASECHANGELOGLOCK $copy_cdr_db_name  \
-    > $tmp_dir/$cdr_schema_file
+function finish {
+  rm -f ${CREATE_DB_FILE}
+}
+trap finish EXIT
 
-mysql -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} $new_cdr_db_name < $tmp_dir/$cdr_schema_file
-rm $tmp_dir/$cdr_schema_file
+cat create_db.sql | envsubst > $CREATE_DB_FILE
 
-# Dump the couy cdr data from the hardcoded data tables -- criteria, db_domain .. and import
-echo "Dumping Hard coded data "
-mysqldump -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} \
-     --add-drop-table --disable-keys $copy_cdr_db_name db_domain criteria > $tmp_dir/$hard_data_file
-mysql -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} $new_cdr_db_name < $tmp_dir/$hard_data_file
+# Drop and create new cdr database
+mysql -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} -e "drop database if exists $CDR_DB_NAME"
+echo "Creating database if it does not exist..."
+mysql -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} < ${CREATE_DB_FILE}
 
-rm $tmp_dir/$hard_data_file
+#mysql -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} -e "create database $CDR_DB_NAME"
+
+# Use liquibase to generate the schema and data
+echo "Running liquibase "
+../gradlew update -PrunList=schema
+../gradlew update -PrunList=data -Pcontexts=local
+
+
+#mysqldump -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} \
+#    --no-data --add-drop-table --ignore-table=$copy_cdr_db_name.DATABASECHANGELOG \
+#    --ignore-table=$copy_cdr_db_name.DATABASECHANGELOGLOCK $copy_cdr_db_name  \
+#    > $tmp_dir/$cdr_schema_file
+#
+#mysql -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} $new_cdr_db_name < $tmp_dir/$cdr_schema_file
+#rm $tmp_dir/$cdr_schema_file
+#
+## Dump the couy cdr data from the hardcoded data tables -- criteria, db_domain .. and import
+#echo "Dumping Hard coded data "
+#mysqldump -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} \
+#     --add-drop-table --disable-keys $copy_cdr_db_name db_domain criteria > $tmp_dir/$hard_data_file
+#mysql -h ${DB_HOST} --port ${DB_PORT} -u root -p${MYSQL_ROOT_PASSWORD} $new_cdr_db_name < $tmp_dir/$hard_data_file
+#
+#rm $tmp_dir/$hard_data_file
 
 # Success
 exit 0

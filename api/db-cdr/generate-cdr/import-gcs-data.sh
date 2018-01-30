@@ -1,6 +1,7 @@
 #!/bin/bash
 set -xeuo pipefail
 IFS=$'\n\t'
+# Imports data from gcs bucket into local mysql cdr<VERSION> tables
 
 USAGE="./generate-cdr/import-gcs-data.sh --account <ACCOUNT> --bucket <BUCKET>  --cdr-version <YYYYMMDD>"
 while [ $# -gt 0 ]; do

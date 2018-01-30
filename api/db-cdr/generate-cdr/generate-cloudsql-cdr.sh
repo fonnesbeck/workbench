@@ -85,6 +85,30 @@ if [[ $CDR_VERSION =~ ^[0-9]{4}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$ ]]; th
     exit 1
 fi
 
+
+# Init the local cdr database
+# Init the db to fresh state ready for new cdr data keeping schema and certain tables
+echo "Initializing new cdr db"
+if ./generate-cdr/init-new-cdr-db.sh --cdr-version $CDR_VERSION
+then
+  echo "Local MYSQL CDR Initialized"
+else
+  echo "Local MYSQL CDR failed to initialize"
+  exit 1
+fi
+
+# Import the gcs data
+echo "Initializing new cdr db"
+if ./generate-cdr/import-gcs-data.sh --account $ACCOUNT --bucket $BUCKET --cdr-version $CDR_VERSION
+then
+  echo "Imported data to local database"
+else
+  echo "Local MYSQL CDR failed to initialize"
+  exit 1
+fi
+exit 0
+
+
 # Make BigQuery dbs
 echo "Making big query dataset for cloudsql cdr"
 if ./generate-cdr/make-bq-data.sh --bq-project $BQ_PROJECT --bq-dataset $BQ_DATASET --workbench-project $WORKBENCH_PROJECT --account $ACCOUNT --cdr-version $CDR_VERSION

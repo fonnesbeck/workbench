@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { Http, HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClarityModule } from '@clr/angular';
@@ -35,6 +35,10 @@ import { TreeContainerComponent } from './tree-container/tree-container.componen
 import {DataBrowserService} from 'generated';
 import {ConceptDrawerComponent} from './concept-drawer/concept-drawer.component';
 
+const DataBrowserServiceFactory = (http: Http) => {
+  return new DataBrowserService(http, 'http://api.public.org', null);
+};
+
 @NgModule({
   imports: [
       BrowserModule,
@@ -67,7 +71,11 @@ import {ConceptDrawerComponent} from './concept-drawer/concept-drawer.component'
   ],
   providers: [
       AchillesService,
-      DataBrowserService,
+    {
+      provide:DataBrowserService,
+      useFactory: DataBrowserServiceFactory,
+      deps: [Http]
+    },
       TreeService,
       {
         provide: HighchartsStatic,

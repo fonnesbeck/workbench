@@ -85,6 +85,82 @@ button.btn.btn-primary:disabled {
   cursor: auto;
 }
 
+button.btn.btn-secondary {
+  background-color: #fff;
+  border: 2px solid #262262;
+  font-family: GothamMedium;
+  padding: 0rem 0.77rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  cursor: hand;
+  text-transform: uppercase;
+  color: #262262;
+  letter-spacing: 0.02rem;
+  line-height: 0.77rem;
+}
+button.btn.btn-secondary:hover {
+  background-color: #262262;
+  color: #fff;
+}
+button.btn.btn-secondary:disabled {
+  border: 2px solid #c3c3c3;
+  background-color: #f1f2f2;
+  color: #c3c3c3;
+  cursor: auto;
+}
+
+.field-wrapper input[type=text],
+.field-wrapper textarea {
+  border-radius: 0.1rem;
+  border: 1px solid #c3c3c3;
+  padding: 1rem 0.77rem;
+  line-height: 0.77rem;
+}
+
+.field-wrapper input[type=text]:focus,
+.field-wrapper textarea:focus {
+  border: 1px solid #262262;
+}
+
+div.alert .alert-items .alert-text {
+  color: #fff;
+}
+
+div.alert.alert-success {
+  background-color: #8bc990;
+  border: none;
+}
+
+div.alert.alert-warning {
+  background-color: #f8c954;
+  border: none;
+}
+
+div.alert.alert-error {
+  background-color: #f58771;
+  border: none;
+}
+
+#body .top-nav .tab-link {
+  background-color: #262262;
+  border: none;
+}
+
+#body .top-nav .tab-link.active {
+  background-color: #4356a7;
+  border: none;
+}
+
+a.btn.btn-link {
+  font-family: GothamMedium;
+  color: #262262;
+}
+
+a.btn.btn-link:hover {
+  color: #262262;
+  text-decoration: underline;
+}
+
 .loading-text {
   padding-left: 0.3rem;
   color: #888;

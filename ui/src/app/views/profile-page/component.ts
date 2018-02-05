@@ -1,8 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
 import {ErrorHandlingService} from 'app/services/error-handling.service';
-import {SignInService} from 'app/services/sign-in.service';
-import {Profile, ProfileService} from 'generated';
+import {BlockscoreIdVerificationStatus, Profile, ProfileService} from 'generated';
 
 @Component({
   styleUrls: ['./component.css'],
@@ -10,14 +9,13 @@ import {Profile, ProfileService} from 'generated';
 })
 export class ProfilePageComponent implements OnInit {
   verifiedStatusIsLoaded: boolean;
-  verifiedStatusIsValid: boolean;
+  verifiedStatus: BlockscoreIdVerificationStatus;
   profile: Profile;
   profileLoaded = false;
   editHover = false;
   constructor(
       private errorHandlingService: ErrorHandlingService,
       private profileService: ProfileService,
-      private signInService: SignInService,
   ) {}
 
   ngOnInit(): void {
@@ -27,17 +25,10 @@ export class ProfilePageComponent implements OnInit {
   getVerifiedStatus(): void {
     this.errorHandlingService.retryApi(this.profileService.getMe()).subscribe(
         (profile: Profile) => {
-      console.log(profile);
-      this.verifiedStatusIsValid = profile.blockscoreVerificationIsValid;
+      this.verifiedStatus = profile.blockscoreIdVerificationStatus;
       this.verifiedStatusIsLoaded = true;
       this.profile = profile;
       this.profileLoaded = true;
-    });
-  }
-
-  deleteAccount(): void {
-    this.profileService.deleteAccount().subscribe(() => {
-      this.signInService.signOut();
     });
   }
 

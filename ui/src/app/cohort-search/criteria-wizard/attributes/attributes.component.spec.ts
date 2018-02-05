@@ -1,7 +1,7 @@
 import {NgRedux} from '@angular-redux/store';
 import {MockNgRedux} from '@angular-redux/store/testing';
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {ClarityModule} from 'clarity-angular';
+import {ClarityModule} from '@clr/angular';
 import {fromJS, Map} from 'immutable';
 
 import {CohortSearchActions} from '../../redux';
@@ -18,9 +18,9 @@ describe('AttributesComponent', () => {
 
   beforeEach(async(() => {
     mockReduxInst = MockNgRedux.getInstance();
-    const _old = mockReduxInst.getState;
-    const _wrapped = () => fromJS(_old());
-    mockReduxInst.getState = _wrapped;
+    const old = mockReduxInst.getState;
+    const wrapped = () => fromJS(old());
+    mockReduxInst.getState = wrapped;
 
     TestBed
       .configureTestingModule({

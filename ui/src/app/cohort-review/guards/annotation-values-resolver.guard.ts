@@ -30,14 +30,16 @@ export class AnnotationValuesResolver implements Resolve<ParticipantCohortAnnota
 
     const rid = route.parent.data.review.cohortReviewId;
 
-    console.log(`Loading annotations from resolver for ${pid}`);
-    console.log(`ns: ${ns}, wsid: ${wsid}, rid: ${rid}`);
-    console.dir(route);
+    // console.log(`Loading annotations from resolver for ${pid}`);
+    // console.log(`ns: ${ns}, wsid: ${wsid}, rid: ${rid}`);
+    // console.dir(route);
 
-    return this.reviewAPI
+    const call = this.reviewAPI
       .getParticipantCohortAnnotations(ns, wsid, rid, pid)
       .catch(err => Observable.of(empty))
       .pluck('items')
       .do(vals => this.state.annotationValues.next(<ParticipantCohortAnnotation[]>vals));
+
+    return (call as Observable<ParticipantCohortAnnotation[]>);
   }
 }

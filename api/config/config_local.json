@@ -1,0 +1,23 @@
+// Configuration for the local development environment.
+{
+  "firecloud": {
+    "debugEndpoints": false,
+    "billingAccountId": "001A68-D1B344-975E93",
+    "billingProjectPrefix": "aou-test-free1-",
+    "registeredDomainName": "all-of-us-registered-test",
+    "enforceRegistered": false
+  },
+  "cdr": {
+    "defaultCdrVersion": "Test Registered CDR"
+  },
+  "googleCloudStorageService": {
+    "credentialsBucketName": "all-of-us-workbench-test-credentials"
+  },
+  "googleDirectoryService": {
+    "gSuiteDomain": "fake-research-aou.org"
+  },
+  "server": {
+    "stackdriverApiKey": "",
+    "projectId": "all-of-us-workbench-test"
+  }
+}

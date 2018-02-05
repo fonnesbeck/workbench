@@ -84,6 +84,12 @@ parameters:
     format: int64
     required: true
     description: specifies which participant
+  userId:
+    in: path
+    name: userId
+    type: integer
+    format: int64
+    required: true
 
 
 paths:
@@ -198,14 +204,6 @@ paths:
           description: Error occurred while creating account.
           schema:
             $ref: "#/definitions/ErrorResponse"
-    delete:
-      tags:
-        - profile
-      description: Deletes your account in the researchallofus.org domain.
-      operationId: deleteAccount
-      responses:
-        204:
-          description: Account deleted successfully.
 
   /v1/id-verification:
     post:
@@ -326,8 +324,6 @@ paths:
           description: request carrying user email to add
           schema:
             $ref: "#/definitions/AuthDomainRequest"
-      tags:
-        - authDomain
       summary: add a user to an auth domain if you have manage groups permission
       operationId: addUserToAuthDomain
     delete:
@@ -624,7 +620,7 @@ paths:
 
             $ref: '#/definitions/EmptyResponse'
 
-  /v1/workspaces/review:
+  /v1/admin/workspaces/review:
     get:
       tags:
         - workspaces
@@ -638,7 +634,46 @@ paths:
           schema:
             $ref: "#/definitions/WorkspaceListResponse"
 
-  /v1/workspaces/{workspaceNamespace}/{workspaceId}/review:
+  /v1/admin/users/id-verification/list:
+    get:
+      tags:
+        - profile
+      description: >
+          Returns a list of profiles for users to be reviewed. Requires
+          REVIEW_ID_VERIFICATION authority.
+      operationId: getIdVerificationsForReview
+      responses:
+        200:
+          description: A list of users to be id verified
+          schema:
+            $ref: "#/definitions/IdVerificationListResponse"
+        403:
+          description: User doesn't have the REVIEW_ID_VERIFICATION authority
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /v1/admin/users/id-verification/{userId}/review:
+    parameters:
+      - $ref: '#/parameters/userId'
+    post:
+      tags:
+        - profile
+      description: >
+          Manually sets the ID verfication status for a user. Requires
+          REVIEW_ID_VERIFICATION authority.
+      operationId: reviewIdVerification
+      parameters:
+        - in: body
+          name: review
+          schema:
+            $ref: "#/definitions/IdVerificationReviewRequest"
+      responses:
+        200:
+          description: return updated list of profiles
+          schema:
+            $ref: "#/definitions/IdVerificationListResponse"
+
+  /v1/admin/workspaces/{workspaceNamespace}/{workspaceId}/review:
     parameters:
       - $ref: '#/parameters/workspaceNamespace'
       - $ref: '#/parameters/workspaceId'
@@ -658,6 +693,26 @@ paths:
           description: success
           schema:
             $ref: "#/definitions/EmptyResponse"
+
+  # Note: all requests tagged as "cron" must have the header X-Appengine-Cron:
+  # true, which app engine itself only sets when invoking as a cronjob.
+  # See https://cloud.google.com/appengine/docs/standard/java/config/cron#securing_urls_for_cron
+
+  /v1/cron/auditBigQuery:
+    get:
+      security: []
+      tags:
+        - audit
+        - cron
+      description: >
+        Endpoint meant to be called offline to trigger BigQuery auditing; may be
+        slow to execute. Only executable via App Engine cronjob.
+      operationId: auditBigQuery
+      responses:
+        200:
+          description: Audit was successful.
+          schema:
+            $ref: "#/definitions/AuditBigQueryResponse"
 
   /v1/workspaces/{workspaceNamespace}/{workspaceId}/share:
     parameters:
@@ -805,7 +860,9 @@ paths:
             $ref: "#/definitions/MaterializeCohortResponse"
 
   # Cohort Builder #######################################################################
-  /v1/cohortbuilder/criteria/{type}/{parentId}:
+  /v1/cohortbuilder/{cdrVersionId}/criteria/{type}/{parentId}:
+    parameters:
+      - $ref: '#/parameters/cdrVersionId'
     get:
       tags:
         - cohortBuilder
@@ -829,7 +886,9 @@ paths:
           schema:
             $ref: "#/definitions/CriteriaListResponse"
 
-  /v1/cohortbuilder/search:
+  /v1/cohortbuilder/{cdrVersionId}/search:
+    parameters:
+      - $ref: '#/parameters/cdrVersionId'
     post:
       tags:
         - cohortBuilder
@@ -849,7 +908,9 @@ paths:
             type: integer
             format: int64
 
-  /v1/cohortbuilder/chartinfo:
+  /v1/cohortbuilder/{cdrVersionId}/chartinfo:
+    parameters:
+      - $ref: '#/parameters/cdrVersionId'
     post:
       tags:
         - cohortBuilder
@@ -868,8 +929,9 @@ paths:
           schema:
             $ref: "#/definitions/ChartInfoListResponse"
 
-
-  /v1/cohortbuilder/quicksearch/{type}/{value}:
+  /v1/cohortbuilder/{cdrVersionId}/quicksearch/{type}/{value}:
+    parameters:
+      - $ref: '#/parameters/cdrVersionId'
     get:
       tags:
         - cohortBuilder
@@ -893,6 +955,23 @@ paths:
             $ref: "#/definitions/CriteriaListResponse"
 
   # Cohort Review  #######################################################################
+  /v1/workspaces/{workspaceNamespace}/{workspaceId}/review/{cohortId}/{cdrVersionId}/demographics:
+    parameters:
+      - $ref: '#/parameters/workspaceNamespace'
+      - $ref: '#/parameters/workspaceId'
+      - $ref: '#/parameters/cohortId'
+      - $ref: '#/parameters/cdrVersionId'
+    get:
+      tags:
+        - cohortReview
+      description: Will return a list all values for gender, race and ethnicity.
+      operationId: "getParticipantDemographics"
+      responses:
+        200:
+          description: An object which contains a list of all values for gender, race and ethnicity.
+          schema:
+            $ref: "#/definitions/ParticipantDemographics"
+
   /v1/workspaces/{workspaceNamespace}/{workspaceId}/review/{cohortId}/{cdrVersionId}:
     parameters:
       - $ref: '#/parameters/workspaceNamespace'
@@ -972,7 +1051,7 @@ paths:
           schema:
             $ref: "#/definitions/CohortReview"
 
-  /v1/workspaces/{workspaceNamespace}/{workspaceId}/review/{cohortId}/{cdrVersionId}/status/{participantId}:
+  /v1/workspaces/{workspaceNamespace}/{workspaceId}/review/{cohortId}/{cdrVersionId}/participants/{participantId}:
     parameters:
       - $ref: '#/parameters/workspaceNamespace'
       - $ref: '#/parameters/workspaceId'
@@ -1185,227 +1264,6 @@ paths:
           schema:
             $ref: '#/definitions/EmptyResponse'
 
-  # Data Browser #######################################################################
-  /v1/databrowser/search-concepts:
-    get:
-      security: []
-      tags:
-        - dataBrowser
-
-      description: Searches for concepts in concept table with search string and filters
-      operationId: "getConceptsSearch"
-      parameters:
-        - in: query
-          name: concept_name
-          type: string
-          required: false
-          description: concept name search string
-        - in: query
-          name: standard_concept
-          type: string
-          required: false
-          description: standard concept filter
-        - in: query
-          name: concept_code
-          type: string
-          required: false
-          description: concept code  filter
-        - in: query
-          name: vocabulary_id
-          type: string
-          required: false
-          description: vocabulary id filter
-        - in: query
-          name: domain_id
-          type: string
-          required: false
-          description: vocabulary id filter
-      responses:
-        200:
-          description: A collection of concepts
-          schema:
-            $ref: "#/definitions/ConceptListResponse"
-
-  /v1/databrowser/analysis-results:
-    get:
-      security: []
-      tags:
-        - dataBrowser
-
-      description: Gets results for an analysis id and stratum
-      operationId: "getAnalysisResults"
-      parameters:
-        - in: query
-          name: analysis_id
-          type: integer
-          format: int64
-          required: true
-          description: analysis_id
-        - in: query
-          name: stratum_1
-          type: string
-          required: false
-          description: stratum 1
-        - in: query
-          name: stratum_2
-          type: string
-          required: false
-          description: stratum 2
-      responses:
-        200:
-          description: A collection of analysis results from achilles_results_view
-          schema:
-            $ref: "#/definitions/AnalysisResultListResponse"
-
-  /v1/databrowser/analyses:
-    get:
-      security: []
-      tags:
-        - dataBrowser
-
-      description: Gets list of analysis definitions
-      operationId: "getAnalyses"
-      parameters: []
-      responses:
-        200:
-          description: A collection of analysis definitions
-          schema:
-            $ref: "#/definitions/AnalysisListResponse"
-
-  /v1/databrowser/participant-count:
-    get:
-      security: []
-      tags:
-        - dataBrowser
-
-      description: Gets results for an analysis id and stratum
-      operationId: "getParticipantCount"
-      parameters: []
-      responses:
-        200:
-          description: A collection of analysis results from achilles_results_view
-          schema:
-            $ref: "#/definitions/AnalysisResult"
-
-  /v1/databrowser/concept-count:
-    get:
-      security: []
-      tags:
-        - dataBrowser
-
-      description: Gets count for concept
-      operationId: "getConceptCount"
-      parameters:
-       - in: query
-         name: concept_id
-         type: string
-         required: true
-         description: concept id to get count for
-      responses:
-        200:
-          description: A collection with concept count for concept id
-          schema:
-            $ref: "#/definitions/AnalysisResultListResponse"
-
-  /v1/databrowser/concept-count-by-gender:
-    get:
-      security: []
-      tags:
-        - dataBrowser
-
-      description: Gets counts for concept by gender
-      operationId: "getConceptCountByGender"
-      parameters:
-       - in: query
-         name: concept_id
-         type: string
-         required: true
-         description: concept id to get count for
-      responses:
-        200:
-          description: A collection with count for concept by gender
-          schema:
-            $ref: "#/definitions/AnalysisResultListResponse"
-
-  /v1/databrowser/concept-count-by-age:
-    get:
-      security: []
-      tags:
-        - dataBrowser
-
-      description: Gets counts for concept by age
-      operationId: "getConceptCountByAge"
-      parameters:
-       - in: query
-         name: concept_id
-         type: string
-         required: true
-         description: concept id to get count for
-      responses:
-        200:
-          description: A collection with count for concept by age decile
-          schema:
-            $ref: "#/definitions/AnalysisResultListResponse"
-
-  /v1/databrowser/db-domains:
-    get:
-      security: []
-      tags:
-        - dataBrowser
-
-      description: Gets list of analysis definitions
-      operationId: "getDbDomains"
-      parameters: []
-      responses:
-        200:
-          description: A collection of databrowser domains
-          schema:
-            $ref: "#/definitions/DbDomainListResponse"
-
-  /v1/databrowser/child-concepts:
-    get:
-      security: []
-      tags:
-        - dataBrowser
-
-      description: Get children of the given concept
-      operationId: "getChildConcepts"
-      parameters:
-        - in: query
-          name: concept_id
-          type: integer
-          format: int64
-          required: true
-          description: concept id to get maps to concepts
-      responses:
-        200:
-          description: a collection of concepts
-          schema:
-            $ref: "#/definitions/ConceptListResponse"
-
-  /v1/databrowser/parent-concepts:
-      get:
-        security: []
-        tags:
-          - dataBrowser
-
-        description: Gets parent concepts for the given concept
-        operationId: "getParentConcepts"
-        parameters:
-          - in: query
-            name: concept_id
-            type: integer
-            format: int64
-            required: true
-            description: concept id to get maps to concepts
-        responses:
-          200:
-            description: A collection of databrowser domains
-            schema:
-              $ref: "#/definitions/ConceptListResponse"
-
-
-
 ##########################################################################################
 ## DEFINITIONS
 ##########################################################################################
@@ -1421,6 +1279,14 @@ definitions:
       gsuiteDomain:
         type: string
         description: G-Suite domain containing user accounts.
+      projectId:
+        type: string
+        description: The cloud project in which this app is running.
+      stackdriverApiKey:
+        type: string
+        description: |
+          Stackdriver API key for error reporting, scoped to a particular
+          domain. If unset, Stackdriver error reporting should be disabled.
 
   # Mirrors BillingProjectMembership from fireCloud.yaml
   BillingProjectMembership:
@@ -1459,14 +1325,12 @@ definitions:
     type: string
     description: actions a user can have authority/permission to perform
     enum: [
+        # Note: Swagger trims any common prefix from enum values' corresponding
+        # Java fields by default; this has no side-effect currently as there is
+        # no common prefix. https://github.com/swagger-api/swagger-codegen/issues/4261
         REVIEW_RESEARCH_PURPOSE,
         MANAGE_GROUP,
-        # Swagger trims any common prefix from enum values' corresponding Java
-        # fields by default; include a bogus sentinel value to prevent that.
-        # https://github.com/swagger-api/swagger-codegen/issues/4261
-        # TODO: Remove this sentinel when adding a new enum value with a
-        # unique prefix (but leave the above cautionary comment).
-        _PREVENT_COMMON_PREFIX_TRIMMING
+        REVIEW_ID_VERIFICATION
     ]
 
   WorkspaceListResponse:
@@ -1664,6 +1528,14 @@ definitions:
       approved:
         type: boolean
 
+  IdVerificationReviewRequest:
+    type: object
+    required:
+      - newStatus
+    properties:
+      newStatus:
+        $ref: "#/definitions/BlockscoreIdVerificationStatus"
+
   CohortListResponse:
     type: object
     required:
@@ -1814,6 +1686,10 @@ definitions:
       - enabledInFireCloud
       - dataAccessLevel
     properties:
+      userId:
+        description: researchallofus userId
+        type: integer
+        format: int64
       username:
         description: researchallofus username
         type: string
@@ -1843,9 +1719,9 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Authority"
-      blockscoreVerificationIsValid:
-        type: boolean
-        description: Result of verification or null if not yet attempted.
+      blockscoreIdVerificationStatus:
+        $ref: "#/definitions/BlockscoreIdVerificationStatus"
+        description: Status of ID verification
       termsOfServiceCompletionTime:
         type: integer
         format: int64
@@ -1858,6 +1734,8 @@ definitions:
         type: integer
         format: int64
         description: Timestamp when the user completed a demographic survey in milliseconds since the UNIX epoch.
+      disabled:
+        type: boolean
 
   ErrorResponse:
     type: object
@@ -2232,6 +2110,38 @@ definitions:
       sortColumn:
         type: string
 
+  ParticipantDemographics:
+    type: object
+    required:
+      - genderList
+      - raceList
+      - ethnicityList
+    properties:
+      genderList:
+        type: "array"
+        items:
+          $ref: "#/definitions/ConceptIdName"
+      raceList:
+        type: "array"
+        items:
+          $ref: "#/definitions/ConceptIdName"
+      ethnicityList:
+        type: "array"
+        items:
+          $ref: "#/definitions/ConceptIdName"
+
+  ConceptIdName:
+    type: object
+    required:
+      - conceptId
+      - conceptName
+    properties:
+      conceptId:
+        type: integer
+        format: int64
+      conceptName:
+        type: string
+
   ParticipantCohortStatus:
     type: object
     required:
@@ -2434,6 +2344,12 @@ definitions:
         type: integer
         description: The Value of the annotation if the AnnotationType is INTEGER
 
+  BlockscoreIdVerificationStatus:
+    type: string
+    description: possible values indicating whether the user's ID has been verified
+    enum: [UNVERIFIED, VERIFIED, REJECTED]
+
+
   # Mirrors notebooks definitions ###############################################
   ErrorReport:
     description: ''
@@ -2561,195 +2477,15 @@ definitions:
       accessLevel:
         $ref: '#/definitions/WorkspaceAccessLevel'
 
-  Concept:
+  IdVerificationListResponse:
     type: object
     required:
-      - conceptId
-      - conceptName
-      - domainId
-      - vocabularyId
-      - conceptCode
-      - conceptClassId
-      - standardConcept
-
+      - profileList
     properties:
-      conceptId:
-        description: id of the concept
-        type: integer
-        format: int64
-      conceptName:
-        description: name of concept
-        type: string
-      domainId:
-        description: domain of concept
-        type: string
-      vocabularyId:
-        description: vocabulary of concept
-        type: string
-      conceptCode:
-        description: original vocab code of concept
-        type: string
-      conceptClassId:
-        description: class of concept
-        type: string
-      standardConcept:
-        description: standard concept value 1 char
-        type: string
-      countValue:
-        description: est count in the cdr
-        type: integer
-        format: int64
-      prevalence:
-        description: prevalence among participants percent count divided num participants
-        type: number
-        format: float
-
-
-  ConceptListResponse:
-      type: object
-      required:
-        - items
-      properties:
+      profileList:
+        type: "array"
         items:
-          type: "array"
-          items:
-            $ref: "#/definitions/Concept"
-
-  AnalysisResult:
-      type: object
-      required:
-        - analysisId
-
-      properties:
-        id:
-          description: pk id for jpa code to work
-          type: integer
-          format: int64
-        analysisId:
-          description: id analysis
-          type: integer
-          format: int64
-        countValue:
-          description: count
-          type: integer
-          format: int64
-        stratum1:
-          description: stratum 1
-          type: string
-        stratum1Name:
-          description:  usually concept name corresponding to stratum
-          type: string
-        stratum2:
-          description: stratum 2
-          type: string
-        stratum2Name:
-          description:  usually concept name corresponding to stratum
-          type: string
-        stratum3:
-          description: stratum 3
-          type: string
-        stratum3Name:
-          description:  usually concept name corresponding to stratum
-          type: string
-        stratum4:
-          description: stratum 4
-          type: string
-        stratum4Name:
-          description:  usually concept name corresponding to stratum
-          type: string
-        stratum5:
-          description: stratum 5
-          type: string
-        stratum5Name:
-          description:  usually concept name corresponding to stratum
-          type: string
-
-
-  AnalysisResultListResponse:
-      type: object
-      required:
-        - items
-      properties:
-        items:
-          type: "array"
-          items:
-            $ref: "#/definitions/AnalysisResult"
-
-  Analysis:
-      type: object
-      required:
-        - analysisId
-      properties:
-        analysisId:
-          description: id analysis
-          type: integer
-          format: int64
-        analysisName:
-          description:  analysis name
-          type: string
-        stratum1Name:
-          description:  usually concept name corresponding to stratum
-          type: string
-        stratum2Name:
-          description:  usually concept name corresponding to stratum
-          type: string
-        stratum3Name:
-          description:  usually concept name corresponding to stratum
-          type: string
-        stratum4Name:
-          description:  usually concept name corresponding to stratum
-          type: string
-        stratum5Name:
-          description:  usually concept name corresponding to stratum
-          type: string
-        chartType:
-          description:  chart type to display for this analysis column pie box
-          type: string
-        dataType:
-          description:  data type of this analysis count or distribution
-          type: string
-
-  AnalysisListResponse:
-      type: object
-      required:
-        - items
-      properties:
-        items:
-          type: "array"
-          items:
-            $ref: "#/definitions/Analysis"
-
-  DbDomain:
-      type: object
-      required:
-        - domainId
-      properties:
-        domainId:
-          description: domain id
-          type: string
-        domainDisplay:
-          description:  web display name
-          type: string
-        domainDesc:
-          description:  full desc text
-          type: string
-        domainParent:
-          description:  parent id
-          type: string
-        domainRoute:
-          description:  route
-          type: string
-
-
-  DbDomainListResponse:
-      type: object
-      required:
-        - items
-      properties:
-        items:
-          type: "array"
-          items:
-            $ref: "#/definitions/DbDomain"
+          $ref: "#/definitions/Profile"
 
   AuthDomainRequest:
     type: object
@@ -2758,3 +2494,13 @@ definitions:
     properties:
       email:
         type: string
+
+  AuditBigQueryResponse:
+    type: object
+    properties:
+      numQueryIssues:
+        type: integer
+        format: int32
+        description: >
+          Number of queries issues against the Curated data repository which are
+          flagged as possible audit issues. See logs/alerts for details.

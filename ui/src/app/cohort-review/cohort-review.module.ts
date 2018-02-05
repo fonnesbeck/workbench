@@ -2,8 +2,8 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
-import {RouterModule} from '@angular/router';
-import {ClarityModule} from 'clarity-angular';
+import {RouterModule, Routes} from '@angular/router';
+import {ClarityModule} from '@clr/angular';
 
 import {ChartsModule} from '../charts/charts.module';
 
@@ -24,21 +24,14 @@ import {FullPageDirective} from './directives/fullPage.directive';
 import {SidebarDirective} from './directives/sidebar.directive';
 import {ReviewStateService} from './review-state.service';
 
-import {AnnotationDefnResolver} from './guards/annotation-defn-resolver.guard';
 import {AnnotationValuesResolver} from './guards/annotation-values-resolver.guard';
-import {CohortResolver} from './guards/cohort-resolver.guard';
 import {ParticipantResolver} from './guards/participant-resolver.guard';
-import {ReviewResolver} from './guards/review-resolver.guard';
 /* tslint:enable:max-line-length */
 
-import {
-  CohortAnnotationDefinitionService,
-  CohortReviewService,
-} from 'generated';
+import {WorkspacesService} from 'generated';
 
-
-const routes = [{
-  path: 'workspace/:ns/:wsid/cohorts/:cid/review',
+const routes: Routes = [{
+  path: '',
   component: CohortReviewComponent,
   data: {title: 'Review Cohort Participants'},
   children: [
@@ -61,11 +54,6 @@ const routes = [{
       }
     }
   ],
-  resolve: {
-    review: ReviewResolver,
-    cohort: CohortResolver,
-    annotationDefns: AnnotationDefnResolver,
-  }
 }];
 
 const components = [
@@ -89,17 +77,12 @@ const directives = [
 ];
 
 const services = [
-  CohortAnnotationDefinitionService,
-  CohortReviewService,
   ReviewStateService,
 ];
 
 const guards = [
-  AnnotationDefnResolver,
   AnnotationValuesResolver,
-  CohortResolver,
   ParticipantResolver,
-  ReviewResolver,
 ];
 
 @NgModule({

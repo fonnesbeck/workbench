@@ -9,7 +9,6 @@ import {
   activeItem,
   activeParameterList,
   activeRole,
-  /* tslint:disable-next-line:no-unused-variable */
   CohortSearchState,
   getGroup,
   getItem,
@@ -33,9 +32,13 @@ import {
 @Injectable()
 export class CohortSearchActions {
   constructor(
-    /* tslint:disable-next-line:no-unused-variable */
     private ngRedux: NgRedux<CohortSearchState>,
   ) {}
+
+  /* We instrument the API calls with the CDR version (which is set in the root
+    * component of the Search app and does not change)
+    */
+  cdrVersionId: number;
 
   /*
    * Auto-dispatched action creators:
@@ -72,28 +75,28 @@ export class CohortSearchActions {
   @dispatch() _resetStore = ActionFuncs.resetStore;
 
   /** Internal tooling */
-  _idsInUse = Set<string>();
+  idsInUse = Set<string>();
 
   generateId(prefix?: string): string {
     prefix = prefix || 'id';
-    let newId = `${prefix}_${this._genSuffix()}`;
-    while (this._idsInUse.has(newId)) {
-      newId = `${prefix}_${this._genSuffix()}`;
+    let newId = `${prefix}_${this.genSuffix()}`;
+    while (this.idsInUse.has(newId)) {
+      newId = `${prefix}_${this.genSuffix()}`;
     }
     this.addId(newId);
     return newId;
   }
 
-  _genSuffix(): string {
+  genSuffix(): string {
     return Math.random().toString(36).substr(2, 9);
   }
 
   removeId(id: string): void {
-    this._idsInUse = this._idsInUse.delete(id);
+    this.idsInUse = this.idsInUse.delete(id);
   }
 
   addId(newId: string): void {
-    this._idsInUse = this._idsInUse.add(newId);
+    this.idsInUse = this.idsInUse.add(newId);
   }
 
   get state() {
@@ -102,6 +105,7 @@ export class CohortSearchActions {
 
   debugDir(obj) {if (environment.debug) { console.dir(obj); }}
   debugLog(msg) {if (environment.debug) { console.log(msg); }}
+
 
   /* Higher order actions - actions composed of other actions or providing
    * alternate interfaces for a simpler action.
@@ -188,7 +192,7 @@ export class CohortSearchActions {
     if (isLoaded || isLoading) {
       return;
     }
-    this.requestCriteria(kind, parentId);
+    this.requestCriteria(this.cdrVersionId, kind, parentId);
   }
 
   requestItemCount(role: keyof SearchRequest, itemId: string): void {
@@ -203,7 +207,7 @@ export class CohortSearchActions {
         items: [this.mapGroupItem(itemId)],
       }]
     };
-    this.requestCounts('items', itemId, request);
+    this.requestCounts(this.cdrVersionId, 'items', itemId, request);
   }
 
   requestGroupCount(role: keyof SearchRequest, groupId: string): void {
@@ -216,7 +220,7 @@ export class CohortSearchActions {
       excludes: [],
       [role]: [this.mapGroup(groupId)]
     };
-    this.requestCounts('groups', groupId, request);
+    this.requestCounts(this.cdrVersionId, 'groups', groupId, request);
   }
 
   /**
@@ -258,7 +262,7 @@ export class CohortSearchActions {
     }
 
     const request = this.mapAll();
-    this.requestCharts('searchRequests', SR_ID, request);
+    this.requestCharts(this.cdrVersionId, 'searchRequests', SR_ID, request);
   }
 
   /*
@@ -266,7 +270,7 @@ export class CohortSearchActions {
    * requests
    */
   runAllRequests() {
-    const _doRequests = (kind) => {
+    const doRequests = (kind) => {
       const groups = groupList(kind)(this.state);
       groups.forEach(group => {
         group.get('items', List()).forEach(itemId => {
@@ -275,14 +279,14 @@ export class CohortSearchActions {
         this.requestGroupCount(kind, group.get('id'));
       });
     };
-    _doRequests('includes');
-    _doRequests('excludes');
+    doRequests('includes');
+    doRequests('excludes');
 
     /* Since everything is being run again, the optimizations in
      * `this.requestTotalCount` are sure to be off.  Basically ALL the groups
      * are outdated at the time this runs */
     const request = this.mapAll();
-    this.requestCharts('searchRequests', SR_ID, request);
+    this.requestCharts(this.cdrVersionId, 'searchRequests', SR_ID, request);
   }
 
   mapAll = (): SearchRequest => {
@@ -328,21 +332,21 @@ export class CohortSearchActions {
     };
   }
 
-  mapParameter = (_param): SearchParameter => {
+  mapParameter = (immParam): SearchParameter => {
     const param = <SearchParameter>{
-      parameterId: _param.get('parameterId'),
-      name: _param.get('name', ''),
-      value: _param.get('code'),
-      type: _param.get('type', ''),
-      subtype: _param.get('subtype', ''),
-      group: _param.get('group'),
+      parameterId: immParam.get('parameterId'),
+      name: immParam.get('name', ''),
+      value: immParam.get('code'),
+      type: immParam.get('type', ''),
+      subtype: immParam.get('subtype', ''),
+      group: immParam.get('group'),
     };
 
     if (param.type.match(/^DEMO.*/i)) {
-      param.conceptId = _param.get('conceptId');
-      param.attribute = _param.get('attribute');
+      param.conceptId = immParam.get('conceptId');
+      param.attribute = immParam.get('attribute');
     } else if (param.type.match(/^ICD|CPT|PHECODE.*/i)) {
-      param.domain = _param.get('domainId');
+      param.domain = immParam.get('domainId');
     }
 
     return param;
@@ -396,7 +400,7 @@ export class CohortSearchActions {
    * Loads a JSONified SearchRequest into the store
    */
   loadFromJSON(json: string): void {
-    this._idsInUse = Set<string>();
+    this.idsInUse = Set<string>();
     const entities = this.deserializeEntities(json);
     this.loadEntities(entities);
   }
@@ -405,7 +409,7 @@ export class CohortSearchActions {
    * Reset Store: reset the store to the initial state and wipe all cached ID's
    */
   resetStore(): void {
-    this._idsInUse = Set<string>();
+    this.idsInUse = Set<string>();
     this._resetStore();
   }
 }

@@ -1,4 +1,4 @@
-// Configuration for the all-of-us-workbench-test and local development environments.
+// Configuration for the all-of-us-workbench-test.
 {
   "firecloud": {
     "debugEndpoints": false,
@@ -7,14 +7,17 @@
     "registeredDomainName": "all-of-us-registered-test",
     "enforceRegistered": false
   },
-  "bigquery": {
-    "dataSetId": "test_merge_dec26",
-    "projectId": "all-of-us-ehr-dev"
+  "cdr": {
+    "defaultCdrVersion": "Test Registered CDR"
   },
   "googleCloudStorageService": {
     "credentialsBucketName": "all-of-us-workbench-test-credentials"
   },
   "googleDirectoryService": {
     "gSuiteDomain": "fake-research-aou.org"
+  },
+  "server": {
+    "stackdriverApiKey": "AIzaSyDPoX4Eg7-_FVKi7JFzEKaJpZ4IMRLaER4",
+    "projectId": "all-of-us-workbench-test"
   }
 }

@@ -6,15 +6,12 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
-import {fromJS, List, Map} from 'immutable';
-import {Observable} from 'rxjs/Observable';
+import {fromJS, Map} from 'immutable';
 import {Subscription} from 'rxjs/Subscription';
 
 import {CohortSearchActions} from '../../redux';
 import {AgeFormComponent} from './age-form.component';
 import {AttributesDirective} from './attributes.directive';
-
-import {Attribute} from 'generated';
 
 
 @Component({
@@ -61,8 +58,8 @@ export class AttributesComponent implements AfterViewInit, OnDestroy {
       this.createForm();
     });
 
-    this.subscription.add(submit$.subscribe(_attr => {
-      const attr = fromJS(_attr);
+    this.subscription.add(submit$.subscribe(arg => {
+      const attr = fromJS(arg);
       const parameterId = `param${attr.hashCode()}`;
       const param = this.node
         .set('attribute', attr)

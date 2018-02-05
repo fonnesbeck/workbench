@@ -7,24 +7,21 @@ import com.google.cloud.bigquery.FieldValue;
 import com.google.cloud.bigquery.QueryJobConfiguration;
 import com.google.cloud.bigquery.QueryResponse;
 import com.google.cloud.bigquery.QueryResult;
-import org.pmiops.workbench.config.WorkbenchConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.inject.Provider;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import org.pmiops.workbench.cdr.CdrVersionContext;
+import org.pmiops.workbench.db.model.CdrVersion;
+import org.pmiops.workbench.exceptions.ServerErrorException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class BigQueryService {
 
     @Autowired
     private BigQuery bigquery;
-
-    @Autowired
-    private Provider<WorkbenchConfig> workbenchConfig;
 
     /**
      * Execute the provided query using bigquery.
@@ -46,8 +43,13 @@ public class BigQueryService {
     }
 
     public QueryJobConfiguration filterBigQueryConfig(QueryJobConfiguration queryJobConfiguration) {
-        String returnSql = queryJobConfiguration.getQuery().replace("${projectId}", workbenchConfig.get().bigquery.projectId);
-        returnSql = returnSql.replace("${dataSetId}", workbenchConfig.get().bigquery.dataSetId);
+        CdrVersion cdrVersion = CdrVersionContext.getCdrVersion();
+        if (cdrVersion == null) {
+            throw new ServerErrorException("No CDR version specified");
+        }
+        String returnSql = queryJobConfiguration.getQuery().replace("${projectId}",
+            cdrVersion.getBigqueryProject());
+        returnSql = returnSql.replace("${dataSetId}", cdrVersion.getBigqueryDataset());
         return queryJobConfiguration
                 .toBuilder()
                 .setQuery(returnSql)
@@ -65,6 +67,10 @@ public class BigQueryService {
             throw new BigQueryException(500, "FieldValue is null at position: " + index);
         }
         return row.get(index).getLongValue();
+    }
+
+    public boolean isNull(List<FieldValue> row, int index) {
+      return row.get(index).isNull();
     }
 
     public String getString(List<FieldValue> row, int index) {

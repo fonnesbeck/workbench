@@ -5,7 +5,6 @@ import {Observable} from 'rxjs/Observable';
 
 import {
   CohortSearchActions,
-  /* tslint:disable-next-line:no-unused-variable */
   CohortSearchState,
   criteriaLoadErrors,
   focusedCriterion,
@@ -37,20 +36,18 @@ export class ExplorerComponent implements OnInit {
   private nodeInFocus$: Observable<Map<any, any>>;
 
   constructor(
-    /* tslint:disable:no-unused-variable */
     private ngRedux: NgRedux<CohortSearchState>,
     private actions: CohortSearchActions,
     private api: CohortBuilderService,
-    /* tslint:enable:no-unused-variable */
   ) {}
 
   ngOnInit() {
     const _type = <string>this.rootNode.get('type');
-    const _id = <number>this.rootNode.get('id');
+    const id = <number>this.rootNode.get('id');
 
     // TODO(jms) - loading now needs to listen for either the roots loading or
     // the quicksearch results loading as appropriate
-    this.loading$ = this.ngRedux.select(isCriteriaLoading(_type, _id));
+    this.loading$ = this.ngRedux.select(isCriteriaLoading(_type, id));
     this.errors$ = this.ngRedux.select(criteriaLoadErrors).map(errSet =>
       errSet
         .filter((_, key) => key.first() === this.criteriaType)
@@ -75,7 +72,7 @@ export class ExplorerComponent implements OnInit {
     this.searchValue = value;
     if (value.length >= 3) {
       this.loading$ = this.loading$.merge(Observable.of(true));
-      this.api.getCriteriaTreeQuickSearch(this.criteriaType, value)
+      this.api.getCriteriaTreeQuickSearch(this.actions.cdrVersionId, this.criteriaType, value)
         .first()
         .subscribe(results => {
           this.searchResults = fromJS(results.items);

@@ -39,20 +39,24 @@ export class CohortSearchComponent implements OnInit, OnDestroy {
   @select(isRequstingTotal) isRequesting$: Observable<boolean>;
   @select(activeCriteriaType) criteriaType$: Observable<string>;
 
-  @ViewChild('wrapper') _wrapper;
+  @ViewChild('wrapper') wrapper;
 
   private subscription;
 
-  /* tslint:disable-next-line:no-unused-variable */
   constructor(
     private actions: CohortSearchActions,
     private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
-    this.subscription = this.route.queryParams.subscribe(params => {
+    console.log(`Entering CohortSearchComponent.ngOnInit with route:`);
+    console.dir(this.route);
+
+    const {queryParams: query$, data: data$} = this.route;
+    this.subscription = Observable.combineLatest(query$, data$).subscribe(([params, data]) => {
       /* EVERY time the route changes, reset the store first */
       this.actions.resetStore();
+      this.actions.cdrVersionId = data.workspace.cdrVersionId;
 
       /* If a criteria string is given in the route, we initialize state with
        * it */
@@ -62,7 +66,7 @@ export class CohortSearchComponent implements OnInit, OnDestroy {
         this.actions.runAllRequests();
       }
     });
-    this._updateWrapperDimensions();
+    this.updateWrapperDimensions();
   }
 
   ngOnDestroy() {
@@ -71,11 +75,11 @@ export class CohortSearchComponent implements OnInit, OnDestroy {
 
   @HostListener('window:resize')
   onResize() {
-    this._updateWrapperDimensions();
+    this.updateWrapperDimensions();
   }
 
-  _updateWrapperDimensions() {
-    const wrapper = this._wrapper.nativeElement;
+  updateWrapperDimensions() {
+    const wrapper = this.wrapper.nativeElement;
 
     const {top} = wrapper.getBoundingClientRect();
     wrapper.style.minHeight = pixel(window.innerHeight - top - ONE_REM);

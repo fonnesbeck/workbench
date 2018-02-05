@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {Http} from '@angular/http';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
-import {ClarityModule} from 'clarity-angular';
+import {ClarityModule} from '@clr/angular';
 
 import {IconsModule} from 'app/icons/icons.module';
 import {ErrorHandlingService} from 'app/services/error-handling.service';
@@ -144,7 +144,7 @@ describe('WorkspaceComponent', () => {
     const app = fixture.debugElement.componentInstance;
     expect(app.notebookList.length).toEqual(1);
     expect(app.notebookList[0].name).toEqual('FileDetails');
-    expect(app.notebookList[0].path).toEqual('gs://bucket/notebook/mockFile');
+    expect(app.notebookList[0].path).toEqual('gs://bucket/notebooks/mockFile');
   }));
 
 

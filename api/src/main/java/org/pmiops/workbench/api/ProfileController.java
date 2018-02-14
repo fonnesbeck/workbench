@@ -2,7 +2,6 @@ package org.pmiops.workbench.api;
 
 import com.blockscore.models.Address;
 import com.blockscore.models.Person;
-import com.google.api.services.oauth2.model.Userinfoplus;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Clock;
@@ -15,7 +14,6 @@ import java.util.stream.Collectors;
 import javax.inject.Provider;
 import org.pmiops.workbench.annotations.AuthorityRequired;
 import org.pmiops.workbench.auth.ProfileService;
-import org.pmiops.workbench.auth.UserAuthentication;
 import org.pmiops.workbench.blockscore.BlockscoreService;
 import org.pmiops.workbench.config.WorkbenchConfig;
 import org.pmiops.workbench.config.WorkbenchEnvironment;
@@ -30,15 +28,15 @@ import org.pmiops.workbench.firecloud.ApiException;
 import org.pmiops.workbench.firecloud.FireCloudService;
 import org.pmiops.workbench.google.CloudStorageService;
 import org.pmiops.workbench.google.DirectoryService;
+import org.pmiops.workbench.mailchimp.MailChimpService;
 import org.pmiops.workbench.model.Authority;
 import org.pmiops.workbench.model.BillingProjectMembership;
 import org.pmiops.workbench.model.BillingProjectMembership.StatusEnum;
 import org.pmiops.workbench.model.BlockscoreIdVerificationStatus;
 import org.pmiops.workbench.model.CreateAccountRequest;
-import org.pmiops.workbench.model.DataAccessLevel;
-import org.pmiops.workbench.model.EmptyResponse;
-import org.pmiops.workbench.model.IdVerificationRequest;
+import org.pmiops.workbench.model.EmailVerificationStatus;
 import org.pmiops.workbench.model.IdVerificationListResponse;
+import org.pmiops.workbench.model.IdVerificationRequest;
 import org.pmiops.workbench.model.IdVerificationReviewRequest;
 import org.pmiops.workbench.model.InvitationVerificationRequest;
 import org.pmiops.workbench.model.Profile;
@@ -47,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -80,6 +77,7 @@ public class ProfileController implements ProfileApiDelegate {
   private final DirectoryService directoryService;
   private final CloudStorageService cloudStorageService;
   private final BlockscoreService blockscoreService;
+  private final MailChimpService mailChimpService;
   private final Provider<WorkbenchConfig> workbenchConfigProvider;
   private final WorkbenchEnvironment workbenchEnvironment;
 
@@ -89,6 +87,7 @@ public class ProfileController implements ProfileApiDelegate {
       Clock clock, UserService userService, FireCloudService fireCloudService,
       DirectoryService directoryService,
       CloudStorageService cloudStorageService, BlockscoreService blockscoreService,
+      MailChimpService mailChimpService,
       Provider<WorkbenchConfig> workbenchConfigProvider,
       WorkbenchEnvironment workbenchEnvironment) {
     this.profileService = profileService;
@@ -100,6 +99,7 @@ public class ProfileController implements ProfileApiDelegate {
     this.directoryService = directoryService;
     this.cloudStorageService = cloudStorageService;
     this.blockscoreService = blockscoreService;
+    this.mailChimpService = mailChimpService;
     this.workbenchConfigProvider = workbenchConfigProvider;
     this.workbenchEnvironment = workbenchEnvironment;
   }
@@ -112,8 +112,8 @@ public class ProfileController implements ProfileApiDelegate {
       return ResponseEntity.ok(memberships.stream().map(TO_CLIENT_BILLING_PROJECT_MEMBERSHIP)
           .collect(Collectors.toList()));
     } catch (ApiException e) {
-      log.log(Level.SEVERE, "Error fetching billing project memberships: {0}"
-          .format(e.getResponseBody()), e);
+      log.log(Level.SEVERE, String.format("Error fetching billing project memberships: %s",
+          e.getResponseBody()), e);
       throw new ServerErrorException("Error fetching billing project memberships", e);
     }
   }
@@ -155,8 +155,8 @@ public class ProfileController implements ProfileApiDelegate {
           if (workbenchEnvironment.isDevelopment()) {
             // In local development, just re-use existing projects for the account. (We don't
             // want to create a new billing project every time the database is reset.)
-            log.log(Level.WARNING, "Project with name {0} already exists; using it."
-                .format(billingProjectName));
+            log.log(Level.WARNING, String.format("Project with name '%s' already exists; using it.",
+                billingProjectName));
             break;
           } else {
             numAttempts++;
@@ -174,8 +174,8 @@ public class ProfileController implements ProfileApiDelegate {
       }
     }
     if (numAttempts == MAX_BILLING_PROJECT_CREATION_ATTEMPTS) {
-      throw new ServerErrorException("Encountered {0} billing project name collisions; giving up"
-          .format(String.valueOf(MAX_BILLING_PROJECT_CREATION_ATTEMPTS)));
+      throw new ServerErrorException(String.format("Encountered %d billing project name " +
+          "collisions; giving up", MAX_BILLING_PROJECT_CREATION_ATTEMPTS));
     }
 
     try {
@@ -187,8 +187,8 @@ public class ProfileController implements ProfileApiDelegate {
         // AofU is not the owner of the billing project. This should only happen in local
         // environments (and hopefully never, given the prefix we're using.) If it happens,
         // we may need to pick a different prefix.
-        log.log(Level.SEVERE, ("Unable to add user to billing project {0}: {0}; " +
-            "consider changing billing project prefix").format(billingProjectName,
+        log.log(Level.SEVERE, String.format("Unable to add user to billing project %s: %s; " +
+            "consider changing billing project prefix", billingProjectName,
             e.getResponseBody()), e);
         throw new ServerErrorException("Unable to add user to billing project", e);
       } else {
@@ -278,7 +278,7 @@ public class ProfileController implements ProfileApiDelegate {
     // profile, since it can be edited in our UI as well as the Google UI,  and we're fine with
     // that; the expectation is their profile in AofU will be managed in AofU, not in Google.
 
-    User user = userService.createUser(request.getProfile().getGivenName(),
+    userService.createUser(request.getProfile().getGivenName(),
         request.getProfile().getFamilyName(),
         googleUser.getPrimaryEmail(), request.getProfile().getContactEmail());
 
@@ -334,16 +334,25 @@ public class ProfileController implements ProfileApiDelegate {
         "Missing or incorrect invitationKey (this API is not yet publicly launched)");
     }
   }
+  @Override
   public ResponseEntity<Void> updateProfile(Profile updatedProfile) {
     User user = userProvider.get();
     user.setGivenName(updatedProfile.getGivenName());
     user.setFamilyName(updatedProfile.getFamilyName());
-    user.setContactEmail(updatedProfile.getContactEmail());
+    if (updatedProfile.getContactEmail() != null) {
+      if (!updatedProfile.getContactEmail().equals(user.getContactEmail())) {
+        mailChimpService.addUserContactEmail(updatedProfile.getContactEmail());
+        user.setEmailVerificationStatus(EmailVerificationStatus.PENDING);
+        user.setContactEmail(updatedProfile.getContactEmail());
+      }
+    }
+
     // This does not update the name in Google.
     userDao.save(user);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
+  @Override
   @AuthorityRequired({Authority.REVIEW_ID_VERIFICATION})
   public ResponseEntity<IdVerificationListResponse> getIdVerificationsForReview() {
     IdVerificationListResponse response = new IdVerificationListResponse();
@@ -361,13 +370,14 @@ public class ProfileController implements ProfileApiDelegate {
     return ResponseEntity.ok(response);
   }
 
+  @Override
   @AuthorityRequired({Authority.REVIEW_ID_VERIFICATION})
   public ResponseEntity<IdVerificationListResponse> reviewIdVerification(Long userId, IdVerificationReviewRequest review) {
     BlockscoreIdVerificationStatus status = review.getNewStatus();
     if (status == BlockscoreIdVerificationStatus.VERIFIED) {
-      User user = userService.setIdVerificationApproved(userId, true);
+      userService.setIdVerificationApproved(userId, true);
     } else {
-      User user = userService.setIdVerificationApproved(userId, false);
+      userService.setIdVerificationApproved(userId, false);
     }
     return getIdVerificationsForReview();
   }

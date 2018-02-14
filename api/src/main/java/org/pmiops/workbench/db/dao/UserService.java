@@ -2,13 +2,11 @@ package org.pmiops.workbench.db.dao;
 
 import java.sql.Timestamp;
 import java.time.Clock;
-import java.time.Instant;
-import java.util.function.Function;
 import java.util.List;
+import java.util.function.Function;
 import javax.inject.Provider;
 import org.pmiops.workbench.config.WorkbenchConfig;
 import org.pmiops.workbench.db.model.User;
-import org.pmiops.workbench.exceptions.BadRequestException;
 import org.pmiops.workbench.exceptions.ConflictException;
 import org.pmiops.workbench.exceptions.ForbiddenException;
 import org.pmiops.workbench.exceptions.NotFoundException;
@@ -16,6 +14,7 @@ import org.pmiops.workbench.exceptions.ServerErrorException;
 import org.pmiops.workbench.firecloud.ApiException;
 import org.pmiops.workbench.firecloud.FireCloudService;
 import org.pmiops.workbench.model.DataAccessLevel;
+import org.pmiops.workbench.model.EmailVerificationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -84,7 +83,8 @@ public class UserService {
           && user.getBlockscoreVerificationIsValid()
           && user.getDemographicSurveyCompletionTime() != null
           && user.getEthicsTrainingCompletionTime() != null
-          && user.getTermsOfServiceCompletionTime() != null) {
+          && user.getTermsOfServiceCompletionTime() != null
+          && user.getEmailVerificationStatus().equals(EmailVerificationStatus.SUBSCRIBED)) {
         try {
           this.fireCloudService.addUserToGroup(user.getEmail(),
               configProvider.get().firecloud.registeredDomainName);
@@ -110,6 +110,7 @@ public class UserService {
     user.setFamilyName(familyName);
     user.setGivenName(givenName);
     user.setDisabled(false);
+    user.setEmailVerificationStatus(EmailVerificationStatus.UNVERIFIED);
     try {
       userDao.save(user);
     } catch (DataIntegrityViolationException e) {

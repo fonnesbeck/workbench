@@ -1,17 +1,5 @@
 package org.pmiops.workbench.api;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.google.cloud.bigquery.FieldValue;
 import com.google.cloud.bigquery.QueryResult;
 import com.google.cloud.storage.Blob;
@@ -21,21 +9,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import java.sql.Timestamp;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.pmiops.workbench.cdr.CdrVersionContext;
 import org.pmiops.workbench.cdr.cache.GenderRaceEthnicityConcept;
 import org.pmiops.workbench.cdr.cache.GenderRaceEthnicityType;
 import org.pmiops.workbench.cohortbuilder.ParticipantCounter;
@@ -64,7 +42,9 @@ import org.pmiops.workbench.model.Cohort;
 import org.pmiops.workbench.model.CohortReview;
 import org.pmiops.workbench.model.CreateReviewRequest;
 import org.pmiops.workbench.model.DataAccessLevel;
+import org.pmiops.workbench.model.EmailVerificationStatus;
 import org.pmiops.workbench.model.FileDetail;
+import org.pmiops.workbench.model.ParticipantCohortStatusesRequest;
 import org.pmiops.workbench.model.ResearchPurpose;
 import org.pmiops.workbench.model.ResearchPurposeReviewRequest;
 import org.pmiops.workbench.model.ShareWorkspaceRequest;
@@ -73,6 +53,7 @@ import org.pmiops.workbench.model.UpdateWorkspaceRequest;
 import org.pmiops.workbench.model.UserRole;
 import org.pmiops.workbench.model.Workspace;
 import org.pmiops.workbench.model.WorkspaceAccessLevel;
+import org.pmiops.workbench.notebooks.NotebooksService;
 import org.pmiops.workbench.test.FakeClock;
 import org.pmiops.workbench.test.SearchRequests;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +70,26 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Provider;
+import java.sql.Timestamp;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -118,7 +119,8 @@ public class WorkspacesControllerTest {
     CloudStorageService.class,
     BigQueryService.class,
     CodeDomainLookupService.class,
-    ParticipantCounter.class
+    ParticipantCounter.class,
+    NotebooksService.class
   })
   static class Configuration {
     @Bean
@@ -182,12 +184,16 @@ public class WorkspacesControllerTest {
     user.setUserId(123L);
     user.setFreeTierBillingProjectName("TestBillingProject1");
     user.setDisabled(false);
+    user.setEmailVerificationStatus(EmailVerificationStatus.SUBSCRIBED);
     user = userDao.save(user);
     when(userProvider.get()).thenReturn(user);
     workspacesController.setUserProvider(userProvider);
 
     cdrVersion = new CdrVersion();
     cdrVersion.setName("1");
+    //set the db name to be empty since test cases currently
+    //run in the workbench schema only.
+    cdrVersion.setCdrDbName("");
     cdrVersion = cdrVersionDao.save(cdrVersion);
     cdrVersionId = Long.toString(cdrVersion.getCdrVersionId());
 
@@ -606,6 +612,7 @@ public class WorkspacesControllerTest {
 
   @Test
   public void testCloneWorkspaceWithCohorts() throws Exception {
+    CdrVersionContext.setCdrVersion(cdrVersion);
     Workspace workspace = createDefaultWorkspace();
     workspace = workspacesController.createWorkspace(workspace).getBody();
 
@@ -650,14 +657,14 @@ public class WorkspacesControllerTest {
 
     CohortReview gotCr1 = cohortReviewController.getParticipantCohortStatuses(
         cloned.getNamespace(), cloned.getId(), cohortsByName.get("c1").getId(),
-        cdrVersion.getCdrVersionId(), null, null, null, null, null, null).getBody();
+        cdrVersion.getCdrVersionId(), new ParticipantCohortStatusesRequest()).getBody();
     assertThat(gotCr1.getReviewSize()).isEqualTo(cr1.getReviewSize());
     assertThat(gotCr1.getParticipantCohortStatuses())
         .isEqualTo(cr1.getParticipantCohortStatuses());
 
     CohortReview gotCr2 = cohortReviewController.getParticipantCohortStatuses(
         cloned.getNamespace(), cloned.getId(), cohortsByName.get("c2").getId(),
-        cdrVersion.getCdrVersionId(), null, null, null, null, null, null).getBody();
+        cdrVersion.getCdrVersionId(), new ParticipantCohortStatusesRequest()).getBody();
     assertThat(gotCr2.getReviewSize()).isEqualTo(cr2.getReviewSize());
     assertThat(gotCr2.getParticipantCohortStatuses())
         .isEqualTo(cr2.getParticipantCohortStatuses());
@@ -1014,7 +1021,33 @@ public class WorkspacesControllerTest {
   }
 
   @Test
-  public void testNoteBookList() throws Exception {
+  public void testNotebookFileList() throws Exception {
+    mockObjectsForBuckFileList();
+      // Will return 1 entry as only python files in notebook folder are return
+    List<FileDetail> result = workspacesController
+        .getNoteBookList("mockProjectName", "mockWorkspaceName").getBody();
+    assertEquals(result.size(), 1);
+
+    try {
+      workspacesController.getNoteBookList("mockProject", "mockWorkspace");
+      fail();
+    } catch (NotFoundException ex) {
+      //Expected
+    }
+  }
+
+  @Test
+  public void testLocalizeAllFiles() throws Exception {
+    mockObjectsForBuckFileList();
+    try {
+      workspacesController.localizeAllFiles("mockProjectName", "mockWorkspaceName");
+    }
+    catch(Exception ex){
+      fail();
+    }
+  }
+
+  private void mockObjectsForBuckFileList() throws ApiException {
     org.pmiops.workbench.firecloud.model.WorkspaceResponse fcResponse =
         new org.pmiops.workbench.firecloud.model.WorkspaceResponse();
     org.pmiops.workbench.firecloud.model.WorkspaceResponse fcResponseWithException =
@@ -1034,18 +1067,8 @@ public class WorkspacesControllerTest {
     when(mockBlob.getName()).thenReturn("notebooks/mockFile.ipynb");
     when(mockBlob1.getName()).thenReturn("notebooks/mockFile.text");
     List<Blob> blobList = ImmutableList.of(mockBlob, mockBlob1);
-    when(fireCloudService.getWorkspace("mockProject", "mockWorkspace")).thenThrow(new NotFoundException());
     when(cloudStorageService.getBlobList("MockBucketName", "notebooks")).thenReturn(blobList);
-    // Will return 1 entry as only python files in notebook folder are return
-    List<FileDetail> result = workspacesController
-        .getNoteBookList("mockProjectName", "mockWorkspaceName").getBody();
-    assertEquals(result.size(), 1);
+    when(fireCloudService.getWorkspace("mockProject", "mockWorkspace")).thenThrow(new NotFoundException());
 
-    try {
-      workspacesController.getNoteBookList("mockProject", "mockWorkspace");
-      fail();
-    } catch (NotFoundException ex) {
-      // NotFoundException expected
-    }
   }
 }

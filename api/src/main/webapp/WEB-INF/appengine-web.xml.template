@@ -2,22 +2,25 @@
   <service>api</service>
   <runtime>java8</runtime>
   <threadsafe>true</threadsafe>
-  <application>all-of-us-workbench-test</application>
 
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
   </system-properties>
 
   <env-variables>
-    <env-var name="spring.datasource.driver-class-name" value="${DB_DRIVER}"/>
-    <env-var name="spring.datasource.url" value="${DB_CONNECTION_STRING}"/>
-    <env-var name="spring.datasource.username" value="${WORKBENCH_DB_USER}"/>
-    <env-var name="spring.datasource.password" value="${WORKBENCH_DB_PASSWORD}"/>
+    <env-var name="workbench.datasource.driver-class-name" value="${DB_DRIVER}"/>
+    <env-var name="workbench.datasource.url" value="${DB_CONNECTION_STRING}"/>
+    <env-var name="workbench.datasource.username" value="${WORKBENCH_DB_USER}"/>
+    <env-var name="workbench.datasource.password" value="${WORKBENCH_DB_PASSWORD}"/>
   </env-variables>
 
   <resource-files>
     <include path="WEB-INF/sa-key.json"></include>
   </resource-files>
+
+  <static-error-handlers>
+    <handler file="server_unavailable.html" />
+  </static-error-handlers>
 
   <automatic-scaling>
     <min-idle-instances>1</min-idle-instances>

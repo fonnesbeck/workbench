@@ -18,6 +18,24 @@
   <div class="field">
     <h5 class="field-label">Contact Email:</h5>
     <div *ngIf="profileLoaded else loading" class="data">{{profile.contactEmail}}</div>
+    <div *ngIf="profileLoaded">
+      <div class="alert alert-warning"*ngIf="profile.emailVerificationStatus !== 'subscribed'">
+        <div class="alert-items">
+          <div class="alert-item static">
+            <div class="alert-icon-wrapper"><clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon></div>
+            <span class="alert-text">Your email address is awaiting verification. Please check your inbox for an email from All of Us Researcher Workbench, click on the link inside and then reload this page.</span>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-success" *ngIf="profile.emailVerificationStatus === 'subscribed'">
+        <div class="alert-items">
+          <div class="alert-item static">
+            <div class="alert-icon-wrapper"><clr-icon class="alert-icon" shape="check-circle"></clr-icon></div>
+            <span class="alert-text">Your email address has been verified.</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <div class="field">
@@ -31,12 +49,12 @@
 </ng-template>
 <div>
   <h3>Identity Verification</h3>
-  <div *ngIf="!verifiedStatusIsLoaded; else verifiedStatusMessage">
+  <div *ngIf="!profileLoaded; else verifiedStatusMessage">
     <!-- TODO(dmohs): Spinner. -->
     Checking verification status...
   </div>
   <ng-template #verifiedStatusMessage>
-    <div *ngIf="verifiedStatus === 'UNVERIFIED'">
+    <div *ngIf="profile.blockscoreIdVerificationStatus === 'UNVERIFIED'">
       <div class="alert alert-warning">
         <div class="alert-items">
           <div class="alert-item static">
@@ -51,7 +69,7 @@
         <a routerLink="id-verification">Verify your identity</a>
       </div>
     </div>
-    <div class="alert alert-success" *ngIf="verifiedStatus === 'VERIFIED'">
+    <div class="alert alert-success" *ngIf="profile.blockscoreIdVerificationStatus === 'VERIFIED'">
       <div class="alert-items">
         <div class="alert-item static">
           <div class="alert-icon-wrapper">
@@ -61,7 +79,7 @@
         </div>
       </div>
     </div>
-    <div class="alert alert-danger" *ngIf="verifiedStatus === 'REJECTED'">
+    <div class="alert alert-danger" *ngIf="profile.blockscoreIdVerificationStatus === 'REJECTED'">
       <div class="alert-items">
         <div class="alert-item static">
           <div class="alert-icon-wrapper">

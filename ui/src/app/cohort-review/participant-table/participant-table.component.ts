@@ -1,19 +1,24 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {State} from '@clr/angular';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ClrDatagridStateInterface} from '@clr/angular';
 import {Subscription} from 'rxjs/Subscription';
 
 import {Participant} from '../participant.model';
 import {ReviewStateService} from '../review-state.service';
 
 const CDR_VERSION = 1;
-const getProperty = filt => (<{property: string, value: string}>filt).property;
-const getValue = filt => (<{property: string, value: string}>filt).value;
 
 import {
+  Cohort,
   CohortReview,
   CohortReviewService,
-  ParticipantCohortStatus
+  Filter,
+  Operator,
+  ParticipantCohortStatus,
+  ParticipantCohortStatusColumns as Columns,
+  ParticipantCohortStatusesRequest as Request,
+  SortOrder,
+  Workspace,
 } from 'generated';
 
 @Component({
@@ -21,7 +26,17 @@ import {
   templateUrl: './participant-table.component.html',
 })
 export class ParticipantTableComponent implements OnInit, OnDestroy {
-  DUMMY_DATA: Participant[];
+
+  readonly columnsEnum = {
+    participantId: Columns.ParticipantId,
+    gender: Columns.Gender,
+    race: Columns.Race,
+    ethnicity: Columns.Ethnicity,
+    birthDate: Columns.BirthDate,
+    status: Columns.Status
+  };
+
+  participants: Participant[];
 
   review: CohortReview;
   loading: boolean;
@@ -31,44 +46,67 @@ export class ParticipantTableComponent implements OnInit, OnDestroy {
     private reviewAPI: CohortReviewService,
     private state: ReviewStateService,
     private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   ngOnInit() {
     this.loading = false;
-
-    this.subscription = this.state.review$
-      .do(review => this.review = review)
-      .pluck('participantCohortStatuses')
-      .map(statusSet =>
-        (<ParticipantCohortStatus[]>statusSet).map(Participant.makeRandomFromExisting))
-      .subscribe(val => this.DUMMY_DATA = <Participant[]>val);
+    this.subscription = this.state.review$.subscribe(review => {
+      this.review = review;
+      this.participants = review.participantCohortStatuses.map(Participant.fromStatus);
+    });
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  refresh(state: State) {
-    const {ns, wsid, cid} = this.route.parent.snapshot.params;
-
-    const page = Math.floor(state.page.from / state.page.size);
-    const pageSize = state.page.size;
-
-    const sortColumn = state.sort && <string>(state.sort.by);
-    const sortOrder = state.sort &&
-      (state.sort.reverse ? 'desc' : 'asc');
-
-    const filterColumns = state.filters && state.filters.map(getProperty);
-    const filterValues = state.filters && state.filters.map(getValue);
-
-    console.dir(state);
-
+  refresh(state: ClrDatagridStateInterface) {
     setTimeout(() => this.loading = true, 0);
-    this.reviewAPI.getParticipantCohortStatuses(ns, wsid, cid, CDR_VERSION,
-                                                page, pageSize,
-                                                sortColumn, sortOrder,
-                                                filterColumns, filterValues)
-      .do(r => this.loading = false)
+    // console.log('Datagrid state: ');
+    // console.dir(state);
+
+    /* Populate the query with page / pagesize and then defaults */
+    const query = <Request>{
+      page: Math.floor(state.page.from / state.page.size),
+      pageSize: state.page.size,
+      sortColumn: Columns.ParticipantId,
+      sortOrder: SortOrder.Asc,
+      filters: {items: []},
+    };
+
+    if (state.sort) {
+      const sortby = <string>(state.sort.by);
+      query.sortColumn = this.columnsEnum[sortby];
+      query.sortOrder = state.sort.reverse
+        ? SortOrder.Desc
+        : SortOrder.Asc;
+    }
+
+    if (state.filters) {
+      query.filters.items = <Filter[]>(state.filters.map(
+        ({property, value}: any) => (<Filter>{property, value, operator: Operator.Equal})
+      ));
+    }
+
+    const {ns, wsid, cid} = this.pathParams;
+
+    // console.log('Participant page request parameters:');
+    // console.dir(query);
+
+    return this.reviewAPI
+      .getParticipantCohortStatuses(ns, wsid, cid, CDR_VERSION, query)
+      .do(_ => this.loading = false)
       .subscribe(review => this.state.review.next(review));
+  }
+
+  private get pathParams() {
+    const paths = this.route.snapshot.pathFromRoot;
+    const params: any = paths.reduce((p, r) => ({...p, ...r.params}), {});
+
+    const ns: Workspace['namespace'] = params.ns;
+    const wsid: Workspace['id'] = params.wsid;
+    const cid: Cohort['id'] = +(params.cid);
+    return {ns, wsid, cid};
   }
 }

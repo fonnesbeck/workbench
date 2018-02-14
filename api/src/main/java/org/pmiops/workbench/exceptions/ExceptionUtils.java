@@ -1,5 +1,6 @@
 package org.pmiops.workbench.exceptions;
 
+import com.ecwid.maleorang.MailchimpException;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletResponse;
 import org.pmiops.workbench.firecloud.ApiException;
+import org.pmiops.workbench.model.ErrorResponse;
 
 /**
  * Utility methods related to exceptions.
@@ -78,8 +80,7 @@ public class ExceptionUtils {
         if (isGoogleServiceUnavailableException(e)) {
           if (numAttempts > 1 && numAttempts < MAX_ATTEMPTS) {
             log.log(Level.SEVERE,
-                "Service unavailable, attempt #{0}; retrying..."
-                    .format(String.valueOf(numAttempts)), e);
+                String.format("Service unavailable, attempt %s; retrying...", numAttempts), e);
             try {
               // Sleep with some backoff.
               Thread.sleep(2000 * numAttempts );
@@ -94,6 +95,26 @@ public class ExceptionUtils {
     }
   }
 
+  public static ErrorResponse errorResponse(String message) {
+    ErrorResponse response = new ErrorResponse();
+    response.setMessage(message);
+    return response;
+  }
+
+  public static RuntimeException convertMailchimpError(MailchimpException e) {
+    switch (e.code) {
+      case 400: case 414: case 422:
+        throw new BadRequestException(e);
+      case 401: case 403: case 405:
+        throw new ForbiddenException();
+      case 404:
+        throw new NotFoundException();
+      case 429:
+        throw new ServerUnavailableException();
+      default:
+        throw new ServerErrorException(e);
+    }
+  }
 
   private ExceptionUtils() {}
 }

@@ -94,6 +94,20 @@ parameters:
 
 paths:
 
+  /v1/status:
+    get:
+      tags:
+        - status
+      description: Returns the status of the various services and integrations
+      operationId: getStatus
+      security: []
+      responses:
+        200:
+          description: A map of system name to status.
+          schema:
+            $ref: "#/definitions/StatusResponse"
+
+
   /v1/config:
     get:
       tags:
@@ -525,6 +539,35 @@ paths:
          schema:
           $ref: '#/definitions/ErrorReport'
 
+  /v1/workspaces/{workspaceNamespace}/{workspaceId}/localize-all-files:
+    get:
+      summary: Get file details from google bucket and then localize to notebook server
+      description: Get files details from bucket folders config and notebooks and then localize to notebook server
+      operationId: localizeAllFiles
+      tags:
+        - workspaces
+      parameters:
+        - in: path
+          name: workspaceNamespace
+          description: workspaceNamespace
+          required: true
+          type: string
+        - in: path
+          name: workspaceId
+          description: workspaceId
+          required: true
+          type: string
+      responses:
+        200:
+          description: Files have been localized
+        404:
+          description: Workspace or Cluster not found
+          schema:
+            $ref: '#/definitions/ErrorReport'
+        500:
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/ErrorReport'
 
   # Billing projects #####################################################################
 
@@ -997,7 +1040,14 @@ paths:
           description: A cohortReviewId and cohort count
           schema:
             $ref: "#/definitions/CohortReview"
-    get:
+
+  /v1/workspaces/{workspaceNamespace}/{workspaceId}/review/{cohortId}/{cdrVersionId}/participants:
+    parameters:
+      - $ref: '#/parameters/workspaceNamespace'
+      - $ref: '#/parameters/workspaceId'
+      - $ref: '#/parameters/cohortId'
+      - $ref: '#/parameters/cdrVersionId'
+    post:
       tags:
          - cohortReview
       description:  >
@@ -1005,46 +1055,12 @@ paths:
         does pagination based on page, limit, order and column.
       operationId: "getParticipantCohortStatuses"
       parameters:
-        - in: query
-          name: page
-          type: integer
-          required: false
-          description: specific page (default is 0)
-        - in: query
-          name: pageSize
-          type: integer
-          required: false
-          description: page size of results (default is 25)
-        - in: query
-          name: sortColumn
-          type: string
-          enum: [participantId, status, gender, birthDate, race, ethnicity]
-          default: 'participantId'
-          required: false
-          description: Column upon which to sort (default is 'participantId')
-        - in: query
-          name: sortOrder
-          type: string
-          enum: ['asc', 'desc']
-          default: 'asc'
-          required: false
-          description: Sort direction (default is ascending)
-        - in: query
-          name: filterColumn
-          type: array
-          collectionFormat: csv
-          required: false
-          uniqueItems: true
-          items:
-            type: string
-            enum: [participantId, status, gender, birthDate, race, ethnicity]
-        - in: query
-          name: filterValue
-          type: array
-          collectionFormat: csv
-          required: false
-          items:
-            type: string
+        - in: body
+          name: request
+          required: true
+          description: request body for getting list of ParticipantCohortStatuses.
+          schema:
+            $ref: "#/definitions/ParticipantCohortStatusesRequest"
       responses:
         200:
           description: A collection of participants
@@ -1269,6 +1285,17 @@ paths:
 ##########################################################################################
 definitions:
 
+  StatusResponse:
+    type: object
+    required:
+      - firecloudStatus
+      - notebooksStatus
+    properties:
+      firecloudStatus:
+        type: boolean
+      notebooksStatus:
+        type: boolean
+
   ConfigResponse:
     type: object
     required:
@@ -1315,10 +1342,23 @@ definitions:
     description: levels of access to data in the curated data repository
     enum: &DATA_ACCESS_LEVEL [unregistered, registered, protected, revoked]
 
+  EmailVerificationStatus:
+    type: string
+    description: stage of email verification
+    enum: &EMAIL_VERIFICATION_STATUS [unverified, pending, subscribed]
+
   EmptyResponse:
     type: object
     properties:
       additionalInfo:
+        type: string
+
+  VerifyEmailRequest:
+    type: object
+    properties:
+      emailToVerify:
+        type: string
+      username:
         type: string
 
   Authority:
@@ -1736,6 +1776,8 @@ definitions:
         description: Timestamp when the user completed a demographic survey in milliseconds since the UNIX epoch.
       disabled:
         type: boolean
+      emailVerificationStatus:
+        $ref: "#/definitions/EmailVerificationStatus"
 
   ErrorResponse:
     type: object
@@ -2110,6 +2152,65 @@ definitions:
       sortColumn:
         type: string
 
+  ParticipantCohortStatusesRequest:
+    type: object
+    required:
+      - page
+      - pageSize
+      - sortColumn
+      - sortOrder
+    properties:
+      page:
+        type: integer
+        description: specific page (default is 0)
+      pageSize:
+        type: integer
+        description: page size of results (default is 25)
+      sortColumn:
+        $ref: "#/definitions/ParticipantCohortStatusColumns"
+        description: Column upon which to sort (default is 'participantId')
+      sortOrder:
+        $ref: "#/definitions/SortOrder"
+        description: Sort direction (default is ascending)
+      filters:
+        $ref: "#/definitions/FilterList"
+
+  ParticipantCohortStatusColumns:
+    type: string
+    enum: [participantId, status, gender, birthDate, race, ethnicity]
+
+  SortOrder:
+    type: string
+    enum: [asc, desc]
+
+  FilterList:
+    type: object
+    required:
+      - items
+    properties:
+      items:
+        type: "array"
+        items:
+          $ref: "#/definitions/Filter"
+
+  Filter:
+    type: object
+    required:
+      - property
+      - operator
+      - value
+    properties:
+      property:
+        $ref: "#/definitions/ParticipantCohortStatusColumns"
+      operator:
+        $ref: "#/definitions/Operator"
+      value:
+        type: string
+
+  Operator:
+    type: string
+    enum: ['=', '<', '>', '<=', '>=', 'like']
+
   ParticipantDemographics:
     type: object
     required:
@@ -2158,7 +2259,7 @@ definitions:
         format: int64
       gender:
         type: string
-      birthDatetime:
+      birthDate:
         type: integer
         format: int64
       raceConceptId:

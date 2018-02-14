@@ -64,6 +64,7 @@ sourceSets {
                    'org/pmiops/workbench/model/Authority.java',
                    'org/pmiops/workbench/model/BlockscoreVerificationStatus.java',
                    'org/pmiops/workbench/model/DataAccessLevel.java',
+                   'org/pmiops/workbench/model/EmailVerificationStatus.java',
                    'org/pmiops/workbench/model/ErrorResponse.java',
                    'org/pmiops/workbench/model/WorkspaceAccessLevel.java',
                    'org/pmiops/workbench/model/CohortStatus.java',
@@ -73,7 +74,16 @@ sourceSets {
                    'org/pmiops/workbench/model/AnnotationType.java']
        excludes = ['org/pmiops/workbench/db/dao/UserService.java',
                    'org/pmiops/workbench/db/dao/WorkspaceService.java',
-                   'org/pmiops/workbench/db/dao/WorkspaceServiceImpl.java']
+                   'org/pmiops/workbench/db/dao/WorkspaceServiceImpl.java',
+                   'org/pmiops/workbench/db/dao/ParticipantCohortStatusDao.java',
+                   'org/pmiops/workbench/db/dao/ParticipantCohortStatusDaoImpl.java',
+                   'org/pmiops/workbench/cohortreview/util/*.java',
+                   'org/pmiops/workbench/model/Filter.java',
+                   'org/pmiops/workbench/model/Operator.java',
+                   'org/pmiops/workbench/model/ParticipantCohortStatusColumns.java',
+                   'org/pmiops/workbench/model/SortOrder.java',
+                   'org/pmiops/workbench/db/dao/CohortService.java',
+                   'org/pmiops/workbench/db/dao/ParticipantCohortStatusDaoCustom.java']
     }
   }
 }

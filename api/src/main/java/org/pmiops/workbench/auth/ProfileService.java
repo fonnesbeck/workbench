@@ -1,12 +1,14 @@
 package org.pmiops.workbench.auth;
 
 import java.util.ArrayList;
-import javax.inject.Provider;
 import org.pmiops.workbench.db.dao.UserDao;
 import org.pmiops.workbench.db.model.User;
+import org.pmiops.workbench.exceptions.NotFoundException;
 import org.pmiops.workbench.firecloud.ApiException;
 import org.pmiops.workbench.firecloud.FireCloudService;
+import org.pmiops.workbench.mailchimp.MailChimpService;
 import org.pmiops.workbench.model.BlockscoreIdVerificationStatus;
+import org.pmiops.workbench.model.EmailVerificationStatus;
 import org.pmiops.workbench.model.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,14 +17,14 @@ import org.springframework.stereotype.Service;
 public class ProfileService {
 
   private final FireCloudService fireCloudService;
-  private final Provider<User> userProvider;
+  private final MailChimpService mailChimpService;
   private final UserDao userDao;
 
   @Autowired
-  public ProfileService(FireCloudService fireCloudService, Provider<User> userProvider,
+  public ProfileService(FireCloudService fireCloudService, MailChimpService mailChimpService,
       UserDao userDao) {
     this.fireCloudService = fireCloudService;
-    this.userProvider = userProvider;
+    this.mailChimpService = mailChimpService;
     this.userDao = userDao;
   }
 
@@ -49,8 +51,7 @@ public class ProfileService {
       profile.setBlockscoreIdVerificationStatus(BlockscoreIdVerificationStatus.UNVERIFIED);
     } else if (user.getBlockscoreVerificationIsValid() == false) {
       profile.setBlockscoreIdVerificationStatus(BlockscoreIdVerificationStatus.REJECTED);
-    }
-    else {
+    } else {
       profile.setBlockscoreIdVerificationStatus(BlockscoreIdVerificationStatus.VERIFIED);
     }
 
@@ -68,9 +69,21 @@ public class ProfileService {
       profile.setDataAccessLevel(user.getDataAccessLevel());
     }
     if (user.getAuthorities() != null) {
-      profile.setAuthorities(new ArrayList(user.getAuthorities()));
+      profile.setAuthorities(new ArrayList<>(user.getAuthorities()));
     }
-
+    EmailVerificationStatus userEmailVerificationStatus = user.getEmailVerificationStatus();
+    // if verification is pending or unverified, need to query MailChimp and update DB accordingly
+    if (!userEmailVerificationStatus.equals(EmailVerificationStatus.SUBSCRIBED)) {
+      if (userEmailVerificationStatus.equals(EmailVerificationStatus.UNVERIFIED)) {
+        mailChimpService.addUserContactEmail(user.getContactEmail());
+        userEmailVerificationStatus = EmailVerificationStatus.PENDING;
+      } else if (userEmailVerificationStatus.equals(EmailVerificationStatus.PENDING)) {
+        userEmailVerificationStatus = EmailVerificationStatus.fromValue(mailChimpService.getMember(user.getContactEmail()));
+      }
+      user.setEmailVerificationStatus(userEmailVerificationStatus);
+      userDao.save(user);
+    }
+    profile.setEmailVerificationStatus(user.getEmailVerificationStatus());
     return profile;
   }
 }

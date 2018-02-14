@@ -1,9 +1,9 @@
 # UI project management commands and command-line flag definitions.
 
 require "optparse"
-require_relative "../../libproject/utils/common"
-require_relative "../../libproject/workbench"
-require_relative "../../libproject/swagger"
+require_relative "../../aou-utils/utils/common"
+require_relative "../../aou-utils/workbench"
+require_relative "../../aou-utils/swagger"
 
 class Options < OpenStruct
 end
@@ -19,17 +19,26 @@ end
 
 def install_dependencies()
   common = Common.new
-
   common.run_inline %W{docker-compose run --rm ui yarn install}
 end
 
+Common.register_command({
+  :invocation => "install-dependencies",
+  :description => "Installs dependencies via yarn.",
+  :fn => Proc.new { |*args| install_dependencies(*args) }
+})
+
 def swagger_regen()
   common = Common.new
-
   Workbench::Swagger.download_swagger_codegen_cli
-
   common.run_inline %W{docker-compose run --rm ui yarn run codegen}
 end
+
+Common.register_command({
+  :invocation => "swagger-regen",
+  :description => "Regenerates API client libraries from Swagger definitions.",
+  :fn => Proc.new { |*args| swagger_regen(*args) }
+})
 
 class DevUpOptions
   ENV_CHOICES = %W{local test prod}
@@ -95,12 +104,22 @@ class DeployUI
     add_options
     @parser.parse @args
     validate_options
-    common.run_inline %W{node_modules/@angular/cli/bin/ng build --environment=test}
+    environment_names = {
+      "all-of-us-workbench-test" => "test",
+      "aou-res-workbench-stable" => "stable",
+    }
+    environment_name = environment_names[@opts.project]
+    common.run_inline %W{node_modules/@angular/cli/bin/ng build --environment=#{environment_name}}
     common.run_inline %W{gcloud app deploy --project #{@opts.project} --account #{@opts.account}
                          --version #{@opts.version} --#{@opts.promote}}
   end
 end
 
+Common.register_command({
+  :invocation => "deploy-ui",
+  :description => "Deploys the UI to the specified cloud project.",
+  :fn => lambda { |*args| DeployUI.new("deploy-ui", args).run }
+})
 
 def dev_up(*args)
   common = Common.new
@@ -121,9 +140,21 @@ def dev_up(*args)
   common.run_inline %W{docker-compose run --rm --service-ports ui}
 end
 
+Common.register_command({
+  :invocation => "dev-up",
+  :description => "Brings up the development environment.",
+  :fn => Proc.new { |*args| dev_up(*args) }
+})
+
 def run_linter()
   Common.new.run_inline %W{docker-compose run --rm ui yarn run lint}
 end
+
+Common.register_command({
+  :invocation => "lint",
+  :description => "Runs linter.",
+  :fn => Proc.new { |*args| run_linter(*args) }
+})
 
 def rebuild_image()
   common = Common.new
@@ -132,43 +163,29 @@ def rebuild_image()
 end
 
 Common.register_command({
-  :invocation => "dev-up",
-  :description => "Brings up the development environment.",
-  :fn => Proc.new { |*args| dev_up(*args) }
-})
-
-Common.register_command({
-  :invocation => "install-dependencies",
-  :description => "Installs dependencies via yarn.",
-  :fn => Proc.new { |*args| install_dependencies(*args) }
-})
-
-Common.register_command({
-  :invocation => "swagger-regen",
-  :description => "Regenerates API client libraries from Swagger definitions.",
-  :fn => Proc.new { |*args| swagger_regen(*args) }
-})
-
-Common.register_command({
-  :invocation => "lint",
-  :description => "Runs linter.",
-  :fn => Proc.new { |*args| run_linter(*args) }
-})
-
-Common.register_command({
   :invocation => "rebuild-image",
   :description => "Re-builds the dev docker image (necessary when Dockerfile is updated).",
   :fn => Proc.new { |*args| rebuild_image(*args) }
 })
 
-Common.register_command({
-  :invocation => "clean-git-hooks",
-  :description => "Removes symlinks created by shared-git-hooks. Necessary before re-installing.",
-  :fn => Proc.new { |*args| clean-git-hooks(*args) }
-})
+def docker_run(cmd_name, args)
+  Common.new.run_inline %W{docker-compose run --rm ui} + args
+end
 
 Common.register_command({
-  :invocation => "deploy-ui",
-  :description => "Deploys the UI to the specified cloud project.",
-  :fn => lambda { |*args| DeployUI.new("deploy-ui", args).run }
+  :invocation => "docker-run",
+  :description => "Runs the specified command in a docker container.",
+  :fn => lambda { |*args| docker_run("docker-run", args) }
+})
+
+def clean_environment(cmd_name, args)
+  common = Common.new
+  common.run_inline %W{rm -rf node_modules}
+  Common.new.run_inline %W{docker-compose down --volumes --rmi=local}
+end
+
+Common.register_command({
+  :invocation => "clean-environment",
+  :description => "Removes node modules, docker volumes and images.",
+  :fn => lambda { |*args| clean_environment("clean-environment", args) }
 })

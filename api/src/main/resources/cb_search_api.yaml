@@ -133,7 +133,7 @@ paths:
           schema:
             $ref: "#/definitions/ChartInfoListResponse"
 
-  /v1/cohortbuilder/{cdrVersionId}/quicksearch/{type}/{value}:
+  /v1/cohortbuilder/{cdrVersionId}/quicksearch/{domain}/{value}:
     parameters:
       - $ref: '#/parameters/cdrVersionId'
     get:
@@ -143,15 +143,20 @@ paths:
       operationId: "getCriteriaTreeQuickSearch"
       parameters:
         - in: path
-          name: type
+          name: domain
           type: string
           required: true
-          description: the specific type of criteria to get
+          description: the specific domain type
         - in: path
           name: value
           type: string
           required: true
           description: value that should match code or name
+        - in: query
+          name: parentId
+          type: integer
+          format: int64
+          description: fetch children of parentId
       responses:
         200:
           description: A collection of criteria

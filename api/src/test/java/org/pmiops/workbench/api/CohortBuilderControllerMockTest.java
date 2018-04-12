@@ -250,7 +250,7 @@ public class CohortBuilderControllerMockTest {
                 .thenReturn(Arrays.asList(expectedCriteria));
 
         assertCriteria(
-                controller.getCriteriaTreeQuickSearch(1L,"PHECODE", "infect"),
+                controller.getCriteriaTreeQuickSearch(1L,"PHECODE", "infect", null),
                 new Criteria()
                         .id(1L)
                         .type("PHECODE")

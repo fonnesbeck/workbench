@@ -136,10 +136,13 @@ public class CohortBuilderController implements CohortBuilderApiDelegate {
     }
 
     @Override
-    public ResponseEntity<CriteriaListResponse> getCriteriaTreeQuickSearch(Long cdrVersionId, String type, String value) {
+    public ResponseEntity<CriteriaListResponse> getCriteriaTreeQuickSearch(Long cdrVersionId,
+                                                                           String domain,
+                                                                           String value,
+                                                                           Long parentId) {
         CdrVersionContext.setCdrVersion(cdrVersionDao.findOne(cdrVersionId));
         String nameOrCode = value + "*";
-        final List<Criteria> criteriaList = criteriaDao.findCriteriaByTypeAndNameOrCode(type, nameOrCode);
+        final List<Criteria> criteriaList = criteriaDao.findCriteriaByTypeAndNameOrCode(domain, nameOrCode);
 
         CriteriaListResponse criteriaResponse = new CriteriaListResponse();
         criteriaResponse.setItems(criteriaList.stream().map(TO_CLIENT_CRITERIA).collect(Collectors.toList()));

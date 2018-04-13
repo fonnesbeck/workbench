@@ -153,15 +153,15 @@ paths:
           required: true
           description: value that should match code or name
         - in: query
-          name: parentId
+          name: conceptId
           type: integer
           format: int64
-          description: fetch children of parentId
+          description: fetch children of conceptId
       responses:
         200:
-          description: A collection of criteria
+          description: A collection of concepts.
           schema:
-            $ref: "#/definitions/CriteriaListResponse"
+            $ref: "#/definitions/ConceptListResponse"
 
   /v1/cohortbuilder/{cdrVersionId}/demographics:
     parameters:
@@ -244,6 +244,34 @@ definitions:
           for leaves in the tree. Parents don't have domain ids and concept
           id will be used in the case that a parent is selectable.
         type: string
+
+  ConceptListResponse:
+    type: object
+    required:
+      - items
+    properties:
+      items:
+        type: "array"
+        items:
+          $ref: "#/definitions/Concept"
+
+  Concept:
+    type: object
+    required:
+      - id
+      - name
+      - group
+    properties:
+      conceptId:
+        description: id of the concept
+        type: integer
+        format: int64
+      name:
+        description: description of criteria
+        type: string
+      group:
+        description: specifies if child or parent
+        type: boolean
 
   SearchRequest:
     description: >

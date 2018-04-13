@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.pmiops.workbench.cdr.model.ConceptCriteria;
 import org.pmiops.workbench.cdr.model.Criteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
@@ -138,6 +139,11 @@ public class CriteriaDaoTest {
 
         assertEquals(1, icd10DomainList.size());
         assertEquals("Condition", icd10DomainList.get(0));
+    }
+
+    @Test
+    public void findConceptCriteriaParent() throws Exception {
+        final List<ConceptCriteria> conceptCriteriaList = criteriaDao.findConceptCriteriaParent();
     }
 
     private Criteria createCriteria(String type, String subtype, String code, String name, long parentId, boolean group, boolean selectable) {

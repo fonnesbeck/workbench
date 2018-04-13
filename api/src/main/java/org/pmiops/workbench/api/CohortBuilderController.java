@@ -11,12 +11,7 @@ import org.pmiops.workbench.cdr.model.Criteria;
 import org.pmiops.workbench.cohortbuilder.ParticipantCounter;
 import org.pmiops.workbench.cohortbuilder.ParticipantCriteria;
 import org.pmiops.workbench.db.dao.CdrVersionDao;
-import org.pmiops.workbench.model.ChartInfo;
-import org.pmiops.workbench.model.ChartInfoListResponse;
-import org.pmiops.workbench.model.ConceptIdName;
-import org.pmiops.workbench.model.CriteriaListResponse;
-import org.pmiops.workbench.model.ParticipantDemographics;
-import org.pmiops.workbench.model.SearchRequest;
+import org.pmiops.workbench.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -136,18 +131,19 @@ public class CohortBuilderController implements CohortBuilderApiDelegate {
     }
 
     @Override
-    public ResponseEntity<CriteriaListResponse> getCriteriaTreeQuickSearch(Long cdrVersionId,
-                                                                           String domain,
-                                                                           String value,
-                                                                           Long parentId) {
+    public ResponseEntity<ConceptListResponse> getCriteriaTreeQuickSearch(Long cdrVersionId,
+                                                                          String domain,
+                                                                          String value,
+                                                                          Long conceptId) {
         CdrVersionContext.setCdrVersion(cdrVersionDao.findOne(cdrVersionId));
         String nameOrCode = value + "*";
         final List<Criteria> criteriaList = criteriaDao.findCriteriaByTypeAndNameOrCode(domain, nameOrCode);
 
-        CriteriaListResponse criteriaResponse = new CriteriaListResponse();
-        criteriaResponse.setItems(criteriaList.stream().map(TO_CLIENT_CRITERIA).collect(Collectors.toList()));
+        ConceptListResponse conceptListResponse = new ConceptListResponse();
+//        R collect = criteriaList.stream().map(TO_CLIENT_CRITERIA).collect(Collectors.toList());
+//        conceptListResponse.setItems(collect);
 
-        return ResponseEntity.ok(criteriaResponse);
+        return ResponseEntity.ok(conceptListResponse);
     }
 
     @Override

@@ -53,26 +53,59 @@ public interface CriteriaDao extends CrudRepository<Criteria, Long> {
     List<Criteria> findCriteriaByTypeAndNameOrCode(@Param("type") String type,
                                                    @Param("value") String value);
 
-    @Query(value = "select CONCEPT_ID, CONCEPT_NAME, 1 AS IS_GROUP from " +
-      "(select rank() over(ORDER BY MAX_LEVELS_OF_SEPARATION DESC) as rnk, B.CONCEPT_ID, B.CONCEPT_NAME " +
-      "from CONCEPT_ANCESTOR a " +
-      "left join concept b on a.ANCESTOR_CONCEPT_ID = b.CONCEPT_ID " +
-      "where DESCENDANT_CONCEPT_ID in (" +
-      "select concept_id " +
-      "from concept " +
-      "where STANDARD_CONCEPT IN ('S','C') " +
-      "and domain_Id = :domainId " +
-      "and concept_name rlike :value)) a" +
+    @Query(value =
+      "select concept_id, " +
+      "       concept_name, " +
+      "       1 as is_group " +
+      "from " +
+      "   (select b.concept_id, " +
+      "           b.concept_name, " +
+      "           @curRank \\:= @curRank + 1 AS rnk " +
+      "      from " +
+      "         (SELECT @curRank \\:= 0) r, " +
+      "         concept_ancestor a " +
+      "      join concept b on a.ancestor_concept_id = b.concept_id " +
+      "     where descendant_concept_id in " +
+      "        (select concept_id " +
+      "          from concept " +
+      "         where standard_concept in ('S','C') " +
+      "           and domain_id = :domainId " +
+      "           and concept_name rlike :value) " +
+      "      order by max_levels_of_separation desc) a " +
       "where rnk = 1", nativeQuery = true)
     List<ConceptCriteria> findConceptCriteriaParent(@Param("domainId") String domainId,
                                                     @Param("value") String value);
 
-    @Query(value = "select * from criteria c " +
-      "where c.type = :type " +
-      "and (match(c.name) against(:value in boolean mode) or match(c.code) against(:value in boolean mode)) " +
-      "and c.is_selectable = 1 " +
-      "order by c.code asc", nativeQuery = true)
-    List<ConceptCriteria> findConceptCriteriaChildren(@Param("domainId") String domainId,
+    @Query(value =
+      "select b.concept_id, " +
+      "       b.concept_name, " +
+      "       case " +
+      "           when c.concept_id_1 is null then 0 " +
+      "           else 1 " +
+      "       end as is_group " +
+      "from concept_relationship a " +
+      "left join concept b on a.concept_id_2 = b.concept_id " +
+      "left join " +
+      "  (select concept_id_1, " +
+      "          count(*) " +
+      "     from concept_relationship a " +
+      "     left join concept b on a.concept_id_2 = b.concept_id " +
+      "     where relationship_id = 'Subsumes' " +
+      "     group by concept_id_1) c on a.concept_id_2 = c.concept_id_1 " +
+      "where a.concept_id_1 = :conceptId " +
+      "  and relationship_id = 'Subsumes' " +
+      "  and concept_id_2 IN " +
+      "    (select ancestor_concept_id " +
+      "       from concept_ancestor a " +
+      "       left join concept b on a.ancestor_concept_id = b.concept_id " +
+      "       where descendant_concept_id in " +
+      "           (select concept_id " +
+      "              from concept " +
+      "             where standard_concept IN ('S','C') " +
+      "               and domain_Id = :domainId " +
+      "               and concept_name rlike :value) )", nativeQuery = true)
+    List<ConceptCriteria> findConceptCriteriaChildren(@Param("conceptId") Long conceptId,
+                                                      @Param("domainId") String domainId,
                                                       @Param("value") String value);
 
 }

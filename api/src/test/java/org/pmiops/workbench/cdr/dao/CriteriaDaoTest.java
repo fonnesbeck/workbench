@@ -143,7 +143,9 @@ public class CriteriaDaoTest {
 
     @Test
     public void findConceptCriteriaParent() throws Exception {
-        final List<ConceptCriteria> conceptCriteriaList = criteriaDao.findConceptCriteriaParent();
+        String domainId = "Condition";
+        String value = "^arthritis$";
+        final List<ConceptCriteria> conceptCriteriaList = criteriaDao.findConceptCriteriaParent(domainId, value);
     }
 
     private Criteria createCriteria(String type, String subtype, String code, String name, long parentId, boolean group, boolean selectable) {

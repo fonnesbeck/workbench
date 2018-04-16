@@ -3,6 +3,26 @@
   <crit-demo-form *ngSwitchCase="'demo'" [open]="open">
   </crit-demo-form>
 
+  <clr-wizard *ngSwitchCase="'standard'"
+    [clrWizardOpen]="open"
+    (clrWizardOnCancel)="onCancel()"
+    (clrWizardOnFinish)="onSubmit()">
+    <clr-wizard-title>Search Standard Concepts</clr-wizard-title>
+
+    <!-- Criteria Selection Page -->
+    <clr-wizard-page [clrWizardPageNextDisabled]="!hasSelection">
+      <ng-template clrPageTitle>{{ critPageTitle }}</ng-template>
+      <div class="page">
+        <div class="main-panel">
+          <crit-standard-search></crit-standard-search>
+        </div>
+        <div class="selection">
+          <crit-criteria-selection></crit-criteria-selection>
+        </div>
+      </div>
+    </clr-wizard-page>
+  </clr-wizard>
+
   <clr-wizard *ngSwitchDefault
     [clrWizardOpen]="open"
     (clrWizardOnCancel)="onCancel()"

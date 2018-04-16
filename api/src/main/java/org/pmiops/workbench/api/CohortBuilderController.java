@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Provider;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -137,15 +138,20 @@ public class CohortBuilderController implements CohortBuilderApiDelegate {
                                                                           String value,
                                                                           Long conceptId) {
         CdrVersionContext.setCdrVersion(cdrVersionDao.findOne(cdrVersionId));
-        final List<ConceptCriteria> criteriaList = criteriaDao.findConceptCriteriaParent(domain, "^" + value + "$");
+        List<ConceptCriteria> criteriaList = new ArrayList<>();
+        if (conceptId == null) {
+            criteriaList = criteriaDao.findConceptCriteriaParent(domain, "^" + value + "$");
+        } else {
+            criteriaList = criteriaDao.findConceptCriteriaChildren(conceptId, domain, "^" + value + "$");
+        }
 
         ConceptCriteriaListResponse conceptCriteriaListResponse = new ConceptCriteriaListResponse();
 
         for (ConceptCriteria conceptCriteria : criteriaList) {
             org.pmiops.workbench.model.ConceptCriteria responseConceptCriteria
               = new org.pmiops.workbench.model.ConceptCriteria()
-              .conceptId(conceptCriteria.getConceptId())
-              .group(conceptCriteria.isGroup())
+              .conceptId(conceptCriteria.getConceptId() == null ? 0L : new Long(conceptCriteria.getConceptId()))
+              .group(conceptCriteria.getIsGroup().equals("1") ? Boolean.TRUE : Boolean.FALSE)
               .name(conceptCriteria.getConceptName());
             conceptCriteriaListResponse.addItemsItem(responseConceptCriteria);
         }

@@ -56,7 +56,7 @@ public interface CriteriaDao extends CrudRepository<Criteria, Long> {
     @Query(value =
       "select concept_id as conceptId, " +
       "       concept_name as conceptName, " +
-      "       1 as group" +
+      "       1 as isGroup " +
       "from concept_ancestor a " +
       "join concept b on a.ancestor_concept_id = b.concept_id " +
       "where descendant_concept_id in " +

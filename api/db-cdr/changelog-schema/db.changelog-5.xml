@@ -8,16 +8,16 @@
     <changeSet author="brianfreeman" id="changelog-5">
 
         <createTable tableName="concept_ancestor">
-            <column name="ancestor_concept_id" type="INTEGER">
+            <column name="ancestor_concept_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="descendant_concept_id" type="INTEGER">
+            <column name="descendant_concept_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="min_levels_of_separation" type="INTEGER">
+            <column name="min_levels_of_separation" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="max_levels_of_separation" type="INTEGER">
+            <column name="max_levels_of_separation" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
         </createTable>

@@ -96,7 +96,8 @@ public interface CriteriaDao extends CrudRepository<Criteria, Long> {
       "              from concept " +
       "             where standard_concept IN ('S','C') " +
       "               and domain_Id = :domainId " +
-      "               and concept_name rlike :value) )", nativeQuery = true)
+      "               and concept_name rlike :value" +
+      "               and b.concept_id is not null) )", nativeQuery = true)
     List<ConceptCriteria> findConceptCriteriaChildren(@Param("conceptId") Long conceptId,
                                                       @Param("domainId") String domainId,
                                                       @Param("value") String value);

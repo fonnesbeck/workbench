@@ -7,6 +7,7 @@ import org.pmiops.workbench.cdr.CdrVersionContext;
 import org.pmiops.workbench.cdr.cache.GenderRaceEthnicityConcept;
 import org.pmiops.workbench.cdr.cache.GenderRaceEthnicityType;
 import org.pmiops.workbench.cdr.dao.CriteriaDao;
+import org.pmiops.workbench.cdr.model.ConceptCriteria;
 import org.pmiops.workbench.cdr.model.Criteria;
 import org.pmiops.workbench.cohortbuilder.ParticipantCounter;
 import org.pmiops.workbench.cohortbuilder.ParticipantCriteria;
@@ -131,19 +132,25 @@ public class CohortBuilderController implements CohortBuilderApiDelegate {
     }
 
     @Override
-    public ResponseEntity<ConceptListResponse> getCriteriaTreeQuickSearch(Long cdrVersionId,
+    public ResponseEntity<ConceptCriteriaListResponse> getCriteriaTreeQuickSearch(Long cdrVersionId,
                                                                           String domain,
                                                                           String value,
                                                                           Long conceptId) {
         CdrVersionContext.setCdrVersion(cdrVersionDao.findOne(cdrVersionId));
-        String nameOrCode = value + "*";
-        final List<Criteria> criteriaList = criteriaDao.findCriteriaByTypeAndNameOrCode(domain, nameOrCode);
+        final List<ConceptCriteria> criteriaList = criteriaDao.findConceptCriteriaParent(domain, "^" + value + "$");
 
-        ConceptListResponse conceptListResponse = new ConceptListResponse();
-//        R collect = criteriaList.stream().map(TO_CLIENT_CRITERIA).collect(Collectors.toList());
-//        conceptListResponse.setItems(collect);
+        ConceptCriteriaListResponse conceptCriteriaListResponse = new ConceptCriteriaListResponse();
 
-        return ResponseEntity.ok(conceptListResponse);
+        for (ConceptCriteria conceptCriteria : criteriaList) {
+            org.pmiops.workbench.model.ConceptCriteria responseConceptCriteria
+              = new org.pmiops.workbench.model.ConceptCriteria()
+              .conceptId(conceptCriteria.getConceptId())
+              .group(conceptCriteria.isGroup())
+              .name(conceptCriteria.getConceptName());
+            conceptCriteriaListResponse.addItemsItem(responseConceptCriteria);
+        }
+
+        return ResponseEntity.ok(conceptCriteriaListResponse);
     }
 
     @Override

@@ -161,7 +161,7 @@ paths:
         200:
           description: A collection of concepts.
           schema:
-            $ref: "#/definitions/ConceptListResponse"
+            $ref: "#/definitions/ConceptCriteriaListResponse"
 
   /v1/cohortbuilder/{cdrVersionId}/demographics:
     parameters:
@@ -245,7 +245,7 @@ definitions:
           id will be used in the case that a parent is selectable.
         type: string
 
-  ConceptListResponse:
+  ConceptCriteriaListResponse:
     type: object
     required:
       - items
@@ -253,12 +253,12 @@ definitions:
       items:
         type: "array"
         items:
-          $ref: "#/definitions/Concept"
+          $ref: "#/definitions/ConceptCriteria"
 
-  Concept:
+  ConceptCriteria:
     type: object
     required:
-      - id
+      - conceptId
       - name
       - group
     properties:

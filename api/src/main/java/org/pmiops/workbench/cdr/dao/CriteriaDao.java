@@ -54,25 +54,18 @@ public interface CriteriaDao extends CrudRepository<Criteria, Long> {
                                                    @Param("value") String value);
 
     @Query(value =
-      "select concept_id, " +
-      "       concept_name, " +
-      "       1 as is_group " +
-      "from " +
-      "   (select b.concept_id, " +
-      "           b.concept_name, " +
-      "           @curRank \\:= @curRank + 1 AS rnk " +
-      "      from " +
-      "         (SELECT @curRank \\:= 0) r, " +
-      "         concept_ancestor a " +
-      "      join concept b on a.ancestor_concept_id = b.concept_id " +
-      "     where descendant_concept_id in " +
+      "select concept_id as conceptId, " +
+      "       concept_name as conceptName, " +
+      "       1 as group" +
+      "from concept_ancestor a " +
+      "join concept b on a.ancestor_concept_id = b.concept_id " +
+      "where descendant_concept_id in " +
       "        (select concept_id " +
       "          from concept " +
       "         where standard_concept in ('S','C') " +
       "           and domain_id = :domainId " +
       "           and concept_name rlike :value) " +
-      "      order by max_levels_of_separation desc) a " +
-      "where rnk = 1", nativeQuery = true)
+       "order by max_levels_of_separation desc limit 1", nativeQuery = true)
     List<ConceptCriteria> findConceptCriteriaParent(@Param("domainId") String domainId,
                                                     @Param("value") String value);
 

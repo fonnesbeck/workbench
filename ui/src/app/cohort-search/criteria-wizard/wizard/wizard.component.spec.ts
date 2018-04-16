@@ -17,6 +17,7 @@ import {
 /* tslint:disable */
 import {AlertsComponent} from '../alerts/alerts.component';
 import {AttributesModule} from '../attributes/attributes.module';
+import {CriteriaSelectionComponent} from '../criteria-selection/criteria-selection.component';
 import {DemoFormComponent} from '../demo-form/demo-form.component';
 import {ExplorerComponent} from '../explorer/explorer.component';
 import {LeafComponent} from '../leaf/leaf.component';
@@ -25,7 +26,7 @@ import {ModifierSelectionComponent} from '../modifier-selection/modifier-selecti
 import {QuickSearchResultsComponent} from '../quicksearch-results/quicksearch-results.component';
 import {QuickSearchComponent} from '../quicksearch/quicksearch.component';
 import {RootSpinnerComponent} from '../root-spinner/root-spinner.component';
-import {CriteriaSelectionComponent} from '../criteria-selection/criteria-selection.component';
+import {StandardSearchComponent} from '../standard-search/standard-search.component';
 import {TreeComponent} from '../tree/tree.component';
 import {WizardComponent} from './wizard.component';
 /* tslint:enable */
@@ -49,6 +50,7 @@ describe('WizardComponent', () => {
       .configureTestingModule({
         declarations: [
           AlertsComponent,
+          CriteriaSelectionComponent,
           DemoFormComponent,
           ExplorerComponent,
           LeafComponent,
@@ -57,7 +59,7 @@ describe('WizardComponent', () => {
           QuickSearchComponent,
           QuickSearchResultsComponent,
           RootSpinnerComponent,
-          CriteriaSelectionComponent,
+          StandardSearchComponent,
           TreeComponent,
           WizardComponent,
         ],

@@ -1,0 +1,26 @@
+<div class="search-bar form-group" [formGroup]="search">
+  <label for="search-value">Search For</label>
+  <div class="select">
+    <select id="domain" formControlName="domain">
+      <option *ngFor="let domain of domains" [value]="domain">
+        {{ domain | titlecase }}
+      </option>
+    </select>
+  </div>
+  <input type="text" id="search-value" formControlName="value">
+  <button type="button" class="btn btn-secondary btn-sm" id="search">
+    Go
+    <clr-icon shape="search"></clr-icon>
+  </button>
+</div>
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+<div class="search-results">
+  {{ search.value | json }}
+</div>

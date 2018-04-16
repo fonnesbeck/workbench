@@ -9,4 +9,7 @@ export const CRITERIA_TYPES = [
   // { name: 'Labs',         type: 'labs' },
   // { name: 'Vitals',       type: 'vitals' },
   // { name: 'Temporal',     type: 'temporal' }
+
+  /* QuickSearch prototype */
+  { name: 'Standard Concepts', type: 'standard' },
 ];

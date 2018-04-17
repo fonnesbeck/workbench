@@ -45,13 +45,13 @@
         "type": "INTEGER"
       },
       {
-        "mode": "NULLABLE", 
-        "name": "domain_id", 
-        "type": "STRING"
-      },
-      {
         "mode": "NULLABLE",
         "name": "concept_id",
         "type": "INTEGER"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "domain_id",
+        "type": "STRING"
       }
 ]

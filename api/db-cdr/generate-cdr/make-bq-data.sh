@@ -109,7 +109,7 @@ load_tables=(db_domain achilles_analysis criteria)
 csv_path=generate-cdr/csv
 for t in "${load_tables[@]}"
 do
-    bq --project=$WORKBENCH_PROJECT load --quote='"' --source_format=CSV --skip_leading_rows=1 $WORKBENCH_DATASET.$t $csv_path/$t.csv
+    bq --project=$WORKBENCH_PROJECT load --quote='"' --source_format=CSV --skip_leading_rows=1 --max_bad_records=10 $WORKBENCH_DATASET.$t $csv_path/$t.csv
 done
 
 # Populate some tables from cdr data

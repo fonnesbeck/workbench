@@ -19,3 +19,7 @@ label, div.select, input {
 #search:focus {
   outline: none;
 }
+
+.search-results {
+  margin-top: 1rem;
+}

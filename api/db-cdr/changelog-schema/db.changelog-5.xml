@@ -22,5 +22,27 @@
             </column>
         </createTable>
 
+        <createIndex
+                indexName="idx_concept_ancestor"
+                tableName="concept_ancestor"
+                unique="true">
+            <column name="ancestor_concept_id"/>
+            <column name="descendant_concept_id"/>
+        </createIndex>
+
+        <createIndex
+                indexName="idx_ancestor_concept_id"
+                tableName="concept_ancestor"
+                unique="false">
+            <column name="ancestor_concept_id"/>
+        </createIndex>
+
+        <createIndex
+                indexName="idx_descendant_concept_id"
+                tableName="concept_ancestor"
+                unique="false">
+            <column name="descendant_concept_id"/>
+        </createIndex>
+
     </changeSet>
 </databaseChangeLog>

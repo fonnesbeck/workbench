@@ -1,4 +1,4 @@
-<div class="search-bar form-group" [formGroup]="search">
+<form class="search-bar form-group" [formGroup]="search" (ngSubmit)="onClick()">
   <label for="search-value">Search For</label>
   <div class="select">
     <select id="domain" formControlName="domain">
@@ -8,19 +8,27 @@
     </select>
   </div>
   <input type="text" id="search-value" formControlName="value">
-  <button type="button" class="btn btn-secondary btn-sm" id="search">
+  <button type="button"
+    (click)="onClick()"
+    class="btn btn-secondary btn-sm"
+    id="search">
     Go
     <clr-icon shape="search"></clr-icon>
   </button>
-</div>
-
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
+</form>
 
 <div class="search-results">
-  {{ search.value | json }}
+  <div *ngIf="loading" class="spinner">
+    Loading...
+  </div>
+  <crit-standard-node *ngFor="let item of roots"
+    [domain]="lastDomain"
+    [value]="lastValue"
+    [cdrid]="cdrid"
+    [node]="item"
+    >
+  </crit-standard-node>
+  <span *ngIf="!loading && roots.length == 0 && search.touched">
+    No Data
+  </span>
 </div>

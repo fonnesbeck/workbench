@@ -26,6 +26,7 @@ import {ModifierSelectionComponent} from '../modifier-selection/modifier-selecti
 import {QuickSearchResultsComponent} from '../quicksearch-results/quicksearch-results.component';
 import {QuickSearchComponent} from '../quicksearch/quicksearch.component';
 import {RootSpinnerComponent} from '../root-spinner/root-spinner.component';
+import {StandardNodeComponent} from '../standard-node/standard-node.component';
 import {StandardSearchComponent} from '../standard-search/standard-search.component';
 import {TreeComponent} from '../tree/tree.component';
 import {WizardComponent} from './wizard.component';
@@ -59,6 +60,7 @@ describe('WizardComponent', () => {
           QuickSearchComponent,
           QuickSearchResultsComponent,
           RootSpinnerComponent,
+          StandardNodeComponent,
           StandardSearchComponent,
           TreeComponent,
           WizardComponent,

@@ -19,6 +19,7 @@
       <column name="count_value" type="NUMERIC" />
     </loadData>
 
+
   </changeSet>
 
 </databaseChangeLog>

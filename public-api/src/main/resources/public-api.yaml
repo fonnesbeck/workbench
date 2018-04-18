@@ -204,6 +204,20 @@ paths:
           schema:
             $ref: "#/definitions/DbDomainListResponse"
 
+  /v1/databrowser/survey-list:
+    get:
+      security: []
+      tags:
+        - dataBroswer
+      description: Gets the list of survey modules
+      operationId: "getSurveyList"
+      parameters: []
+      responses:
+        200:
+          description: A collection of survey modules
+          schema:
+            $ref: "#/definitions/DbDomainListResponse"
+
   /v1/databrowser/child-concepts:
     get:
       security: []
@@ -424,12 +438,20 @@ definitions:
         domainDesc:
           description:  full desc text
           type: string
-        domainParent:
+        dbType:
           description:  parent id
           type: string
         domainRoute:
           description:  route
           type: string
+        conceptId:
+          description: concept id
+          type: integer
+          format: int64
+        numParticipants:
+          description: number of respondents
+          type: integer
+          format: int64
 
 
   DbDomainListResponse:

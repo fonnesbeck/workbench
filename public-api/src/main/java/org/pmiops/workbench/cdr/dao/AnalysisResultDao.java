@@ -12,4 +12,6 @@ public interface AnalysisResultDao extends CrudRepository<AnalysisResult, Long> 
     List<AnalysisResult> findAnalysisResultsByAnalysisIdAndStratum1(Long analysisId, String stratum1);
     List<AnalysisResult> findAnalysisResultsByAnalysisIdAndStratum1AndStratum2(Long analysisId, String stratum1, String stratum2);
     AnalysisResult findAnalysisResultByAnalysisId(Long analysisId);
+
+
 }

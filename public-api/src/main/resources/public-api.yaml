@@ -205,18 +205,19 @@ paths:
             $ref: "#/definitions/DbDomainListResponse"
 
   /v1/databrowser/survey-list:
-    get:
-      security: []
-      tags:
-        - dataBroswer
-      description: Gets the list of survey modules
-      operationId: "getSurveyList"
-      parameters: []
-      responses:
-        200:
-          description: A collection of survey modules
-          schema:
-            $ref: "#/definitions/DbDomainListResponse"
+      get:
+        security: []
+        tags:
+          - dataBrowser
+
+        description: Gets list of survey modules
+        operationId: "getSurveyList"
+        parameters: []
+        responses:
+          200:
+            description: A collection of survey modules
+            schema:
+              $ref: "#/definitions/DbDomainListResponse"
 
   /v1/databrowser/child-concepts:
     get:

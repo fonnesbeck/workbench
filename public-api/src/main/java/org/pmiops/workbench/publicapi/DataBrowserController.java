@@ -128,9 +128,10 @@ public class DataBrowserController implements DataBrowserApiDelegate {
                             .domainId( cdr.getDomainId())
                             .domainDisplay(cdr.getDomainDisplay())
                             .domainDesc(cdr.getDomainDesc())
-                            .domainParent(cdr.getDomainParent())
-                            .domainRoute(cdr.getDomainRoute());
-
+                            .dbType(cdr.getDbType())
+                            .domainRoute(cdr.getDomainRoute())
+                            .conceptId(cdr.getConceptId())
+                            .numParticipants(cdr.getCountValue());
 
                 }
             };
@@ -274,4 +275,10 @@ public class DataBrowserController implements DataBrowserApiDelegate {
         resp.setItems(resultList.stream().map(TO_CLIENT_DBDOMAIN).collect(Collectors.toList()));
         return ResponseEntity.ok(resp);
     }
+
+    @Override
+    public ResponseEntity<DbDomainListResponse> getSurveyList() {
+        return null;
+    }
+
 }

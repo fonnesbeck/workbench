@@ -531,7 +531,7 @@ CAST(p.gender_concept_id as string) as stratum_5,count(distinct p.person_id) as 
 FROM \`${BQ_PROJECT}.${BQ_DATASET}.person\` p inner join \`${BQ_PROJECT}.${BQ_DATASET}.observation\` o on p.person_id = o.person_id
 join  \`${BQ_PROJECT}.${BQ_DATASET}.concept_relationship\` cr on o.observation_source_concept_id=cr.concept_id_1
 join  \`${WORKBENCH_PROJECT}.${WORKBENCH_DATASET}.db_domain\` dbd on cr.concept_id_2=dbd.concept_id where (dbd.db_type='survey' and dbd.concept_id <> 0) and (o.observation_source_concept_id > 0 and o.value_source_concept_id > 0)
-group by dbd.concept_id,o.observation_source_concept_id,o.value_source_concept_id,o.value_as_number,p.gender_concept_id"
+group by dbd.concept_id,o.observation_source_concept_id,o.value_source_concept_id,o.value_as_number,o.value_as_string,p.gender_concept_id"
 
 
 # Survey question answers count by gender(value_as_number not null)

@@ -503,13 +503,11 @@ definitions:
         answerValue:
           description: concept name of answer
           type: string
-        stratum_5:
-          description: gender or age decile
-          type: string
-        countValue:
-          description: number of people who gave this response
-          type: integer
-          format: int64
+        stratum_count:
+          description: list of stratums and respective count values
+          type: "array"
+          items:
+            $ref: "#/definitions/StratumCount"
 
   SurveyAnswerList:
       type: object
@@ -547,6 +545,19 @@ definitions:
           type: "array"
           items:
             $ref: "#/definitions/SurveyQuestion"
+
+  StratumCount:
+      type: object
+      required:
+        - answerConceptId
+      properties:
+        stratum_5:
+          description: stratum 5 value (gender concept id / age decile)
+          type: string
+        count_value:
+          description: count of number of participants who gave same answer
+          type: integer
+          format: int64
 
 
   SurveyResult:

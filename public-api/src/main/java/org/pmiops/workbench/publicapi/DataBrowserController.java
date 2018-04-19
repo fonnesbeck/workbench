@@ -149,7 +149,7 @@ public class DataBrowserController implements DataBrowserApiDelegate {
                     return new org.pmiops.workbench.model.SurveyAnswer()
                             .answerConceptId( cdr.getAnswerConceptId())
                             .answerValue(cdr.getAnswerValue())
-                            .countValue(cdr.getCountValue());
+                            .stratumCount(cdr.getStratumCount());
 
                 }
             };
@@ -341,14 +341,16 @@ public class DataBrowserController implements DataBrowserApiDelegate {
     public ResponseEntity<SurveyResultListResponse> getSurveyResults(Long surveyConceptId,Long analysisId) {
         //System.out.println(String.valueOf(surveyConceptId));
         List<Object[]> questions=analysisResultDao.findSurveyQuestions(String.valueOf(surveyConceptId));
-        System.out.println(questions.size());
+        //System.out.println(questions.size());
         List<SurveyQuestion> surveyQuestion=new ArrayList<>();
         for(int i=0;i<questions.size();i++){
             Object[] que=questions.get(i);
             String questionConceptId=(String)que[0];
             String questionValue=(String)que[1];
             List<Object[]> answers=analysisResultDao.findSurveyAnswers(String.valueOf(surveyConceptId),questionConceptId,String.valueOf(analysisId));
-            List<SurveyAnswer> surveyAnswer=new ArrayList<>();
+            List<SurveyAnswer> surveyAnswers=new ArrayList<>();
+            TreeMap<String,TreeMap<String,Long>> stratum5_counts=new TreeMap<String,TreeMap<String, Long>>();
+            TreeSet<String> doneAnswers=new TreeSet<String>();
             for(int j=0;j<answers.size();j++){
                 Object[] ans=answers.get(j);
                 String answerConceptId;
@@ -366,24 +368,89 @@ public class DataBrowserController implements DataBrowserApiDelegate {
                     answerValue=null;
                 }
                 if(analysisId==3110){
-                    stratum5=null;
+                    stratum5="";
                 }else if(analysisId==3111){
                     stratum5=(String)ans[2];
                 }else if(analysisId==3112){
                     stratum5=(String)ans[2];
                 }
                 countValue=Long.valueOf(String.valueOf(ans[3]));
-                SurveyAnswer surveyAnswerObject=new SurveyAnswer();
-                surveyAnswerObject.setAnswerConceptId(answerConceptId);
-                surveyAnswerObject.setAnswerValue(answerValue);
-                surveyAnswerObject.setStratum5(stratum5);
-                surveyAnswerObject.setCountValue(countValue);
-                surveyAnswer.add(surveyAnswerObject);
+                //surveyAnswerObject.setStratum5(stratum5);
+                //surveyAnswerObject.setCountValue(countValue);
+
+                if(!answerConceptId.isEmpty() && stratum5_counts.containsKey(answerConceptId)){
+                   // System.out.println(answerConceptId);
+                    TreeMap<String,Long> counts=(TreeMap<String,Long>)stratum5_counts.get(answerConceptId);
+                    counts.put(stratum5,countValue);
+                }else if(!answerConceptId.isEmpty() && !(stratum5_counts.containsKey(answerConceptId))){
+                    //System.out.println(answerConceptId+"\t"+stratum5+"\t"+countValue);
+                    TreeMap<String,Long> counts=new TreeMap<String,Long>();
+                    counts.put(stratum5,countValue);
+                    stratum5_counts.put(answerConceptId,counts);
+                }else if(answerConceptId.isEmpty() && !answerValue.isEmpty()){
+                    if(stratum5_counts.containsKey(answerValue)){
+                        TreeMap<String,Long> counts=(TreeMap<String,Long>)stratum5_counts.get(answerValue);
+                        counts.put(stratum5,countValue);
+                    }else if(!(stratum5_counts.containsKey(answerValue))){
+                        TreeMap<String,Long> counts=new TreeMap<String,Long>();
+                        counts.put(stratum5,countValue);
+                        stratum5_counts.put(answerValue,counts);
+                    }
+                }
+
+                if(!doneAnswers.contains(answerConceptId) && !doneAnswers.contains(answerValue)){
+
+                        SurveyAnswer surveyAnswerObject=new SurveyAnswer();
+                        surveyAnswerObject.setAnswerConceptId(answerConceptId);
+                        surveyAnswerObject.setAnswerValue(answerValue);
+                        surveyAnswers.add(surveyAnswerObject);
+                        if(!answerConceptId.isEmpty() && answerValue.isEmpty())
+                            doneAnswers.add(answerConceptId);
+                        else if(answerConceptId.isEmpty() && !answerValue.isEmpty())
+                            doneAnswers.add(answerValue);
+                        else{
+                            doneAnswers.add(answerConceptId);
+                            doneAnswers.add(answerValue);
+                        }
+                }
+
             }
+
+            for(int k=0;k<surveyAnswers.size();k++){
+                SurveyAnswer surveyAnswerObject=surveyAnswers.get(k);
+                String answerConceptId=surveyAnswerObject.getAnswerConceptId();
+                String answerValue=surveyAnswerObject.getAnswerValue();
+                String key=null;
+                if(!answerConceptId.isEmpty())
+                    key=answerConceptId;
+                else if(answerConceptId.isEmpty() && !answerValue.isEmpty())
+                    key=answerValue;
+
+                if(stratum5_counts.containsKey(key)){
+                    TreeMap<String,Long> counts=(TreeMap<String, Long>)stratum5_counts.get(key);
+                    List<StratumCount> stratumCounts=new ArrayList<>();
+                    Iterator it=counts.entrySet().iterator();
+                    while(it.hasNext()){
+                        Map.Entry pair=(Map.Entry)it.next();
+                        String stratum=(String)pair.getKey();
+                        Long count=(Long)pair.getValue();
+                        StratumCount stratumCount=new StratumCount();
+                        stratumCount.setStratum5(stratum);
+                        stratumCount.setCountValue(count);
+                        stratumCounts.add(stratumCount);
+                    }
+                    surveyAnswerObject.setStratumCount(stratumCounts);
+                }
+            }
+
+            if(questionConceptId.equals("1585889")){
+                System.out.println(stratum5_counts);
+            }
+
             SurveyQuestion surveyQuestionObject=new SurveyQuestion();
             surveyQuestionObject.setQuestionConceptId(questionConceptId);
             surveyQuestionObject.setQuestionValue(questionValue);
-            surveyQuestionObject.setAnswers(surveyAnswer);
+            surveyQuestionObject.setAnswers(surveyAnswers);
             surveyQuestion.add(surveyQuestionObject);
         }
 
@@ -392,7 +459,7 @@ public class DataBrowserController implements DataBrowserApiDelegate {
         surveyResult.setAnalysisID(analysisId);
         surveyResult.setQuestions(surveyQuestion);
         Integer surveyRespondentsCount=dbDomainDao.findSurveyParticpantCount(surveyConceptId);
-        System.out.println(surveyRespondentsCount);
+        //System.out.println(surveyRespondentsCount);
         surveyResult.setNumParticipants(Long.valueOf(surveyRespondentsCount));
         List<SurveyResult> surveyResults=new ArrayList<>();
         surveyResults.add(surveyResult);

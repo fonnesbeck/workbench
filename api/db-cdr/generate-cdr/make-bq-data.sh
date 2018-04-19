@@ -97,7 +97,7 @@ fi
 
 # Create bq tables we have json schema for
 schema_path=generate-cdr/bq-schemas
-create_tables=(achilles_analysis achilles_results achilles_results_concept concept concept_relationship criteria db_domain domain vocabulary)
+create_tables=(achilles_analysis achilles_results achilles_results_concept concept concept_relationship criteria db_domain domain vocabulary concept_ancestor)
 for t in "${create_tables[@]}"
 do
     bq --project=$WORKBENCH_PROJECT rm -f $WORKBENCH_DATASET.$t
@@ -133,6 +133,16 @@ bq --quiet --project=$BQ_PROJECT query --nouse_legacy_sql \
  (vocabulary_id, vocabulary_name, vocabulary_reference, vocabulary_version, vocabulary_concept_id)
 SELECT vocabulary_id, vocabulary_name, vocabulary_reference, vocabulary_version, vocabulary_concept_id
 FROM \`$BQ_PROJECT.$BQ_DATASET.vocabulary\`"
+
+##############
+# concept_ancestor #
+##############
+echo "Inserting concept-ancestor"
+bq --quiet --project=$BQ_PROJECT query --nouse_legacy_sql \
+"INSERT INTO \`$WORKBENCH_PROJECT.$WORKBENCH_DATASET.concept_ancestor\`
+ (ancestor_concept_id, descendant_concept_id, min_levels_of_separation, max_levels_of_separation)
+SELECT ancestor_concept_id, descendant_concept_id, min_levels_of_separation, max_levels_of_separation
+FROM \`$BQ_PROJECT.$BQ_DATASET.concept_ancestor\`"
 
 
 ####################

@@ -19,6 +19,7 @@ import {AlertsComponent} from '../alerts/alerts.component';
 import {AttributesModule} from '../attributes/attributes.module';
 import {CriteriaSelectionComponent} from '../criteria-selection/criteria-selection.component';
 import {DemoFormComponent} from '../demo-form/demo-form.component';
+import {DemoSelectComponent} from '../demo-select/demo-select.component';
 import {ExplorerComponent} from '../explorer/explorer.component';
 import {LeafComponent} from '../leaf/leaf.component';
 import {ModifiersComponent} from '../modifiers/modifiers.component';
@@ -53,6 +54,7 @@ describe('WizardComponent', () => {
           AlertsComponent,
           CriteriaSelectionComponent,
           DemoFormComponent,
+          DemoSelectComponent,
           ExplorerComponent,
           LeafComponent,
           ModifiersComponent,

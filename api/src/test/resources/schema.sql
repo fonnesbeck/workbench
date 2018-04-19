@@ -1,1 +1,0 @@
-CREATE TABLE concept_ancestor (ancestor_concept_id bigint, descendant_concept_id bigint, min_levels_of_separation bigint, max_levels_of_separation bigint);

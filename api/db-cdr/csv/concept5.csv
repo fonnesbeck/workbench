@@ -1,0 +1,13 @@
+concept_id,"concept_name","domain_id","vocabulary_id","concept_class_id","standard_concept","concept_code","valid_start_date","valid_end_date","invalid_reason",count_value,prevalence
+4024566,"Muscle finding","Condition","SNOMED","Clinical Finding","S","106030000","19700101","20991231","",0,0.00
+4227253,"Viscus structure finding","Condition","SNOMED","Clinical Finding","S","406123005","19700101","20991231","",0,0.00
+4199402,"Finding of body region","Condition","SNOMED","Clinical Finding","S","301857004","19700101","20991231","",0,0.00
+4047779,"Disorder by body site","Condition","SNOMED","Clinical Finding","S","123946008","19700101","20991231","",0,0.00
+4023995,"Cardiovascular finding","Condition","SNOMED","Clinical Finding","S","106063007","19700101","20991231","",0,0.00
+4093991,"General finding of soft tissue","Condition","SNOMED","Clinical Finding","S","248402002","19700101","20991231","",0,0.00
+4212577,"Skin AND/OR mucosa finding","Condition","SNOMED","Clinical Finding","S","415531008","19700101","20991231","",0,0.00
+4179065,"Gouty arthritis of toe","Condition","SNOMED","Clinical Finding","S","428839004","20080131","20991231","",0,0.00
+4176008,"Arthritis of joint of toe","Condition","SNOMED","Clinical Finding","S","428143003","20080131","20991231","",0,0.00
+40489492,"Inflammation of joint of foot","Condition","SNOMED","Clinical Finding","S","448394006","20110731","20991231","",0,0.00
+37108593,"Gouty arthritis of right great toe","Condition","SNOMED","Clinical Finding","S","1074011000119105","20170731","20991231","",0,0.00
+37108594,"Gouty arthritis of left great toe","Condition","SNOMED","Clinical Finding","S","1074031000119100","20170731","20991231","",0,0.00

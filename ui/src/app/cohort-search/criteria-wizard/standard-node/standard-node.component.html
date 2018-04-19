@@ -1,5 +1,5 @@
 <clr-tree-node >
-  {{ node.conceptId }} | {{ node.name }}
+  <clr-icon *ngIf="!node.group" shape="plus-circle" size="20"></clr-icon> {{ node.conceptId }} | {{ node.name }}
   <ng-template *ngIf="node.group"
     clrIfExpanded
     (clrIfExpandedChange)="loadChildren($event)"

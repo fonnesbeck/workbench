@@ -140,9 +140,9 @@ public class CohortBuilderController implements CohortBuilderApiDelegate {
         CdrVersionContext.setCdrVersion(cdrVersionDao.findOne(cdrVersionId));
         List<ConceptCriteria> criteriaList = new ArrayList<>();
         if (conceptId == null) {
-            criteriaList = criteriaDao.findConceptCriteriaParent(domain, "^" + value + "$");
+            criteriaList = criteriaDao.findConceptCriteriaParent(domain, "[[:<:]]" + value + "[[:>:]]");
         } else {
-            criteriaList = criteriaDao.findConceptCriteriaChildren(conceptId, domain, "^" + value + "$");
+            criteriaList = criteriaDao.findConceptCriteriaChildren(conceptId, domain, "[[:<:]]" + value + "[[:>:]]");
         }
 
         ConceptCriteriaListResponse conceptCriteriaListResponse = new ConceptCriteriaListResponse();

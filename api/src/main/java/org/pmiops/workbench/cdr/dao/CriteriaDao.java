@@ -64,7 +64,7 @@ public interface CriteriaDao extends CrudRepository<Criteria, Long> {
       "          from concept " +
       "         where standard_concept in ('S','C') " +
       "           and domain_id = :domainId " +
-      "           and concept_name rlike :value) " +
+      "           and concept_name regexp :value) " +
        "order by max_levels_of_separation desc limit 1", nativeQuery = true)
     List<ConceptCriteria> findConceptCriteriaParent(@Param("domainId") String domainId,
                                                     @Param("value") String value);
@@ -96,7 +96,7 @@ public interface CriteriaDao extends CrudRepository<Criteria, Long> {
       "              from concept " +
       "             where standard_concept IN ('S','C') " +
       "               and domain_Id = :domainId " +
-      "               and concept_name rlike :value" +
+      "               and concept_name regexp :value" +
       "               and concept_id is not null) )", nativeQuery = true)
     List<ConceptCriteria> findConceptCriteriaChildren(@Param("conceptId") Long conceptId,
                                                       @Param("domainId") String domainId,

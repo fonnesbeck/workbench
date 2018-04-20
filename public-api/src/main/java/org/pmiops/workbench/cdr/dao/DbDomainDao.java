@@ -15,4 +15,6 @@ public interface DbDomainDao extends CrudRepository<DbDomain, Long> {
     @Query(nativeQuery = true,value="SELECT count_value from db_domain where concept_id=?1")
     Integer findSurveyParticpantCount(Long surveyConceptId);
 
+
+
 }

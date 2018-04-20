@@ -286,7 +286,7 @@ paths:
           200:
             description: survey result with collection of survey questions and answers
             schema:
-              $ref: "#/definitions/SurveyResultListResponse"
+              $ref: "#/definitions/SurveyResult"
 
 
 
@@ -396,6 +396,50 @@ definitions:
         stratum5Name:
           description:  usually concept name corresponding to stratum
           type: string
+
+  AchillesResult:
+      type: object
+      required:
+        - analysisId
+
+      properties:
+        id:
+          description: pk id for jpa code to work
+          type: integer
+          format: int64
+        analysisId:
+          description: id analysis
+          type: integer
+          format: int64
+        stratum1:
+          description: stratum 1
+          type: string
+        stratum2:
+          description: stratum 2
+          type: string
+        stratum3:
+          description: stratum 3
+          type: string
+        stratum4:
+          description: stratum 4
+          type: string
+        stratum5:
+          description: stratum 5
+          type: string
+        countValue:
+          description: count
+          type: integer
+          format: int64
+
+  AchillesResultListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: "#/definitions/AchillesResult"
 
 
   AnalysisResultListResponse:
@@ -582,14 +626,5 @@ definitions:
           type: integer
           format: int64
 
-  SurveyResultListResponse:
-      type: object
-      required:
-        - items
-      properties:
-        items:
-          type: "array"
-          items:
-            $ref: "#/definitions/SurveyResult"
 
 

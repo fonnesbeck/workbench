@@ -355,10 +355,8 @@ public class DataBrowserController implements DataBrowserApiDelegate {
             surveyQuestionAnswers.put(questionConceptId,new ArrayList<SurveyAnswer>());
         }
         List<Object[]> results=analysisResultDao.findAchillesResults(String.valueOf(surveyConceptId),analysisId);
-        AchillesResultListResponse achilles_results=new AchillesResultListResponse();
-        achilles_results.setItems(results.stream().map(TO_CLIENT_ACHILLESRESULT).collect(Collectors.toList()));
+        List<AchillesResult> achillesresults=results.stream().map(TO_CLIENT_ACHILLESRESULT).collect(Collectors.toList());
 
-        List<AchillesResult> achillesresults=achilles_results.getItems();
         for(AchillesResult ar:achillesresults){
 
             String questionConceptId=ar.getStratum2();

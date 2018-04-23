@@ -1,0 +1,25 @@
+.search-bar {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+label, div.select, input {
+  margin: 0 0.2rem;
+}
+
+.search-bar input {
+  flex: 1;
+}
+
+#search {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#search:focus {
+  outline: none;
+}
+
+.search-results {
+  margin-top: 1rem;
+}

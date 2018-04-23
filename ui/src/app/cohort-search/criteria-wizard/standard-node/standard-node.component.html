@@ -1,0 +1,16 @@
+<clr-tree-node >
+  <clr-icon *ngIf="!node.group" shape="plus-circle" size="20"></clr-icon> {{ node.conceptId }} | {{ node.name }}
+  <ng-template *ngIf="node.group"
+    clrIfExpanded
+    (clrIfExpandedChange)="loadChildren($event)"
+    >
+    <ng-container [clrLoading]="loading">
+      <crit-standard-node *ngFor="let item of children"
+        [domain]="domain"
+        [value]="value"
+        [cdrid]="cdrid"
+        [node]="item">
+      </crit-standard-node>
+    </ng-container>
+  </ng-template>
+</clr-tree-node>

@@ -20,6 +20,8 @@ import {QuickSearchComponent} from './quicksearch/quicksearch.component';
 import {RootSpinnerComponent} from './root-spinner/root-spinner.component';
 import {TreeComponent} from './tree/tree.component';
 import {WizardComponent} from './wizard/wizard.component';
+import { StandardSearchComponent } from './standard-search/standard-search.component';
+import { StandardNodeComponent } from './standard-node/standard-node.component';
 /* tslint:enable */
 
 
@@ -47,6 +49,8 @@ import {WizardComponent} from './wizard/wizard.component';
     RootSpinnerComponent,
     TreeComponent,
     WizardComponent,
+    StandardSearchComponent,
+    StandardNodeComponent,
   ],
 })
 export class CriteriaWizardModule { }

@@ -1,0 +1,34 @@
+<form class="search-bar form-group" [formGroup]="search" (ngSubmit)="onClick()">
+  <label for="search-value">Search For</label>
+  <div class="select">
+    <select id="domain" formControlName="domain">
+      <option *ngFor="let domain of domains" [value]="domain">
+        {{ domain | titlecase }}
+      </option>
+    </select>
+  </div>
+  <input type="text" id="search-value" formControlName="value">
+  <button type="button"
+    (click)="onClick()"
+    class="btn btn-secondary btn-sm"
+    id="search">
+    Go
+    <clr-icon shape="search"></clr-icon>
+  </button>
+</form>
+
+<div class="search-results">
+  <div *ngIf="loading" class="spinner">
+    Loading...
+  </div>
+  <crit-standard-node *ngFor="let item of roots"
+    [domain]="lastDomain"
+    [value]="lastValue"
+    [cdrid]="cdrid"
+    [node]="item"
+    >
+  </crit-standard-node>
+  <span *ngIf="!loading && roots.length == 0 && search.touched">
+    No Data
+  </span>
+</div>

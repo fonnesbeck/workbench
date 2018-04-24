@@ -204,6 +204,21 @@ paths:
           schema:
             $ref: "#/definitions/DbDomainListResponse"
 
+  /v1/databrowser/survey-questions:
+    get:
+      security: []
+      tags:
+        - dataBrowser
+
+      description: Gets list of survey modules
+      operationId: "getSurveyQuestions5"
+      parameters: []
+      responses:
+        200:
+          description: A collection of survey modules
+          schema:
+            $ref: "#/definitions/QuestionListResponse"
+
   /v1/databrowser/survey-list:
       get:
         security: []
@@ -347,6 +362,60 @@ definitions:
           type: "array"
           items:
             $ref: "#/definitions/Concept"
+
+  QuestionConcept:
+      type: object
+      required:
+        - conceptId
+        - conceptName
+        - domainId
+        - vocabularyId
+        - conceptCode
+        - conceptClassId
+        - standardConcept
+
+      properties:
+        conceptId:
+          description: id of the concept
+          type: integer
+          format: int64
+        conceptName:
+          description: name of concept
+          type: string
+        domainId:
+          description: domain of concept
+          type: string
+        vocabularyId:
+          description: vocabulary of concept
+          type: string
+        conceptCode:
+          description: original vocab code of concept
+          type: string
+        conceptClassId:
+          description: class of concept
+          type: string
+        standardConcept:
+          description: standard concept value 1 char
+          type: string
+        countValue:
+          description: est count in the cdr
+          type: integer
+          format: int64
+        prevalence:
+          description: prevalence among participants percent count divided num participants
+          type: number
+          format: float
+
+
+  QuestionListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: "#/definitions/QuestionConcept"
 
   AnalysisResult:
       type: object

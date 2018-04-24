@@ -19,11 +19,7 @@ import java.util.List;
 @Table(name = "concept")
 public class QuestionConcept extends Concept {
 
-    public QuestionConcept() {
-        super();
-        System.out.println("Question Concept Constructor called");
 
-    }
     private List<AchillesResult> answers;
 
 

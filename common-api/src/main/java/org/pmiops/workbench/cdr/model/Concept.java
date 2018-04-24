@@ -15,6 +15,7 @@ import java.util.Objects;
 @Table(name = "concept")
 public class Concept {
 
+
     private long conceptId;
     private String conceptName;
     private String standardConcept;

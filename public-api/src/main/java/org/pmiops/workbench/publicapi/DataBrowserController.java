@@ -1,13 +1,12 @@
 package org.pmiops.workbench.publicapi;
 
 
-import org.pmiops.workbench.cdr.dao.AchillesAnalysisDao;
-import org.pmiops.workbench.cdr.dao.DbDomainDao;
+import org.pmiops.workbench.cdr.dao.*;
 import org.pmiops.workbench.cdr.model.AchillesAnalysis;
-import org.pmiops.workbench.cdr.dao.ConceptDao;
+
+import org.pmiops.workbench.cdr.model.QuestionConcept;
 import org.pmiops.workbench.cdr.model.Concept;
 import org.pmiops.workbench.cdr.model.DbDomain;
-import org.pmiops.workbench.cdr.dao.AnalysisResultDao;
 import org.pmiops.workbench.cdr.model.AnalysisResult;
 import org.pmiops.workbench.cdr.model.AchillesResult;
 import org.pmiops.workbench.model.*;
@@ -31,6 +30,9 @@ public class DataBrowserController implements DataBrowserApiDelegate {
 
     @Autowired
     private ConceptDao conceptDao;
+
+    @Autowired
+    private QuestionConceptDao  questionConceptDao;
 
     @Autowired
     private AnalysisResultDao analysisResultDao;
@@ -377,11 +379,16 @@ public class DataBrowserController implements DataBrowserApiDelegate {
 
 
     @Override
-    public ResponseEntity<QuestionListResponse> getSurveyQuestions5() {
+    public ResponseEntity<ConceptListResponse> getSurveyQuestions5() {
         // 1586134
-        List<QuestionConcept> resultList = analysisResultDao.findSurveyQuestions5();
-        QuestionListResponse resp=new QuestionListResponse();
-        resp.setItems(resultList.stream().map(TO_CLIENT_QUESTION_CONCEPT).collect(Collectors.toList()));
+        List<QuestionConcept> resultList = questionConceptDao.findSurveyQuestions5(1586134);
+        QuestionConcept o = resultList.get(0);
+        List<AchillesResult> answers = o.getAnswers();
+        System.out.println(o.toString());
+        AchillesResult a = answers.get(0);
+        System.out.println(a.toString());
+        ConceptListResponse resp = new ConceptListResponse();
+        //resp.setItems(resultList.stream().map(TO_CLIENT_QUESTION_CONCEPT).collect(Collectors.toList()));
         return ResponseEntity.ok(resp);
 
     }

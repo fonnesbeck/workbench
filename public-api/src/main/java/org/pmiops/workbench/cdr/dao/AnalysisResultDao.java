@@ -1,7 +1,8 @@
 package org.pmiops.workbench.cdr.dao;
 import org.pmiops.workbench.cdr.model.AnalysisResult;
 import org.pmiops.workbench.cdr.model.AchillesResult;
-import org.pmiops.workbench.model.QuestionConcept;
+import org.pmiops.workbench.cdr.model.QuestionConcept;
+import org.pmiops.workbench.cdr.model.Concept;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -26,9 +27,8 @@ public interface AnalysisResultDao extends CrudRepository<AnalysisResult, Long> 
     @Query(nativeQuery=true, value="SELECT distinct ar.stratum_2,c.concept_name from achilles_results ar join concept c on (ar.stratum_2=c.concept_id) where ar.stratum_1=?1")
     List<QuestionConcept> findSurveyQuestions(String surveyConceptId);
 
-    @Query(nativeQuery=true, value="SELECT concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code,valid_start_date, valid_end_date, invalid_reason, count_value, prevalence  from concept where concept_id = 1585845")
-    List<QuestionConcept> findSurveyQuestions5();
-
+    @Query(nativeQuery=true, value="SELECT concept_id, concept_name, domain_id, vocabulary_id, concept_class_id, standard_concept, concept_code,valid_start_date, valid_end_date, invalid_reason, count_value, prevalence  from concept where concept_id=?1")
+    List<Concept> findSurveyQuestions5(Integer concept_id);
 
 
 }

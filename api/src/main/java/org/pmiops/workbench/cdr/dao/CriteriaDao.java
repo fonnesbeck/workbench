@@ -64,7 +64,7 @@ public interface CriteriaDao extends CrudRepository<Criteria, Long> {
       "          from concept " +
       "         where standard_concept in ('S','C') " +
       "           and domain_id = :domainId " +
-      "           and concept_name regexp :value) " +
+      "           and match(concept_name) against(:value in boolean mode)) " +
        "order by max_levels_of_separation desc limit 1", nativeQuery = true)
     List<ConceptCriteria> findConceptCriteriaParent(@Param("domainId") String domainId,
                                                     @Param("value") String value);
@@ -79,12 +79,14 @@ public interface CriteriaDao extends CrudRepository<Criteria, Long> {
       "from concept_relationship a " +
       "left join concept b on a.concept_id_2 = b.concept_id " +
       "left join " +
-      "  (select concept_id_1, " +
+      "  (select a.concept_id_1, " +
       "          count(*) " +
       "     from concept_relationship a " +
-      "     left join concept b on a.concept_id_2 = b.concept_id " +
-      "     where relationship_id = 'Subsumes' " +
-      "     group by concept_id_1) c on a.concept_id_2 = c.concept_id_1 " +
+      "     join concept b on a.concept_id_2 = b.concept_id " +
+      "     join concept_relationship c on c.concept_id_2 = a.concept_id_1" +
+      "     where a.relationship_id = 'Subsumes' " +
+      "     and c.concept_id_1 = :conceptId " +
+      "     group by a.concept_id_1) c on a.concept_id_2 = c.concept_id_1 " +
       "where a.concept_id_1 = :conceptId " +
       "  and relationship_id = 'Subsumes' " +
       "  and concept_id_2 IN " +

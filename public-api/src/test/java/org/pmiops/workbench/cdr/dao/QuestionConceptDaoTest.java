@@ -3,10 +3,8 @@ package org.pmiops.workbench.cdr.dao;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.pmiops.workbench.cdr.model.AchillesResult;
 import org.pmiops.workbench.cdr.model.QuestionConcept;
-import org.pmiops.workbench.cdr.model.Concept;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -38,9 +36,9 @@ public class QuestionConceptDaoTest {
         return new QuestionConcept()
                 .conceptId(conceptId)
                 .conceptName(conceptName)
-                .conceptClassId("Question")
+                .conceptCode("PPI Whatever")
                 .domainId("Observation")
-                .vocabularyId("PPI");
+                ;
 
     }
 

@@ -1,30 +1,27 @@
 package org.pmiops.workbench.cdr.model;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
-
-import org.pmiops.workbench.cdr.model.AchillesAnalysis;
 
 @Entity
 //TODO need to add a way to dynamically switch between database versions
 //this dynamic connection will eliminate the need for the catalog attribute
 @Table(name = "achilles_results")
-public class AchillesResult  {
+public class Answer {
 
     private Long id;
     private Long analysisId;
-    private AchillesAnalysis analysis;
+    private String analysisName;
     private String stratum1;
     private String stratum2;
     private String stratum3;
     private String stratum4;
     private String stratum5;
+    private String stratum5name;
     private Long countValue;
-    private String stratum5Name;
 
     @Id
     public Long getId() {
@@ -33,7 +30,7 @@ public class AchillesResult  {
     public void setId(Long id) {
         this.id = id;
     }
-    public AchillesResult id(Long val) {
+    public Answer id(Long val) {
         this.id = val;
         return this;
     }
@@ -45,21 +42,8 @@ public class AchillesResult  {
     public void setAnalysisId(Long analysisId) {
         this.analysisId = analysisId;
     }
-    public AchillesResult analysisId(Long val) {
+    public Answer analysisId(Long val) {
         this.analysisId = val;
-        return this;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="analysis_id", insertable=false, updatable=false)
-    public AchillesAnalysis getAnalysis() {
-        return analysis;
-    }
-    public void setAnalysis(AchillesAnalysis analysis) {
-        this.analysis = analysis;
-    }
-    public AchillesResult analysis(AchillesAnalysis analysis) {
-        this.analysis = analysis;
         return this;
     }
 
@@ -70,7 +54,7 @@ public class AchillesResult  {
     public void setStratum1(String stratum1) {
         this.stratum1 = stratum1;
     }
-    public AchillesResult stratum1(String val) {
+    public Answer stratum1(String val) {
         this.stratum1 = val;
         return this;
     }
@@ -82,7 +66,7 @@ public class AchillesResult  {
     public void setStratum2(String stratum2) {
         this.stratum2 = stratum2;
     }
-    public AchillesResult stratum2(String val) {
+    public Answer stratum2(String val) {
         this.stratum2 = val;
         return this;
     }
@@ -94,7 +78,7 @@ public class AchillesResult  {
     public void setStratum3(String stratum3) {
         this.stratum3 = stratum3;
     }
-    public AchillesResult stratum3(String val) {
+    public Answer stratum3(String val) {
         this.stratum3 = val;
         return this;
     }
@@ -106,7 +90,7 @@ public class AchillesResult  {
     public void setStratum4(String stratum4) {
         this.stratum4 = stratum4;
     }
-    public AchillesResult stratum4(String val) {
+    public Answer stratum4(String val) {
         this.stratum4 = val;
         return this;
     }
@@ -118,7 +102,7 @@ public class AchillesResult  {
     public void setStratum5(String stratum5) {
         this.stratum5 = stratum5;
     }
-    public AchillesResult stratum5(String val) {
+    public Answer stratum5(String val) {
         this.stratum5 = val;
         return this;
     }
@@ -130,7 +114,7 @@ public class AchillesResult  {
     public void setCountValue(Long countValue) {
         this.countValue = countValue;
     }
-    public AchillesResult countValue(Long val) {
+    public Answer countValue(Long val) {
         this.countValue = val;
         return this;
     }

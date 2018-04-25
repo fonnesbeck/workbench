@@ -113,6 +113,31 @@ paths:
           description: A collection of analysis definitions
           schema:
             $ref: "#/definitions/AnalysisListResponse"
+  /v1/databrowser/analysis-question:
+    get:
+      security: []
+      tags:
+        - dataBrowser
+
+      description: Gets list of analysis and results by analysis id and question concept id
+      operationId: "getAnalysisSurveyQuestion"
+      parameters:
+        - in: query
+          name: analysis_id
+          type: integer
+          format: int64
+          required: true
+          description: analysis_id
+        - in: query
+          name: stratum_2
+          type: string
+          required: false
+          description: stratum 2
+      responses:
+        200:
+          description: An analysis with results
+          schema:
+            $ref: "#/definitions/Analysis"
 
   /v1/databrowser/participant-count:
     get:
@@ -217,7 +242,7 @@ paths:
         200:
           description: A collection of survey modules
           schema:
-            $ref: "#/definitions/ConceptListResponse"
+            $ref: "#/definitions/QuestionConceptListResponse"
 
   /v1/databrowser/survey-list:
       get:
@@ -363,6 +388,55 @@ definitions:
           items:
             $ref: "#/definitions/Concept"
 
+definitions:
+  QuestionConcept:
+    type: object
+    required:
+      - conceptId
+      - conceptName
+      - domainId
+      - conceptCode
+      - standardConcept
+
+    properties:
+      conceptId:
+        description: id of the concept
+        type: integer
+        format: int64
+      conceptName:
+        description: name of concept
+        type: string
+      domainId:
+        description: domain of concept
+        type: string
+      conceptCode:
+        description: original vocab code of concept
+        type: string
+      countValue:
+        description: est count in the cdr
+        type: integer
+        format: int64
+      prevalence:
+        description: prevalence among participants percent count divided num participants
+        type: number
+        format: float
+      answers:
+        description: answers to questions
+        type: array
+        items:
+          $ref: "#/definitions/AchillesResult"
+
+
+
+  QuestionConceptListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: "#/definitions/QuestionConcept"
 
 
   AnalysisResult:
@@ -414,6 +488,7 @@ definitions:
           description:  usually concept name corresponding to stratum
           type: string
 
+
   AchillesResult:
       type: object
       required:
@@ -428,6 +503,9 @@ definitions:
           description: id analysis
           type: integer
           format: int64
+        analysis:
+          description: analysis object
+          $ref: "#/definitions/Analysis"
         stratum1:
           description: stratum 1
           type: string
@@ -502,6 +580,11 @@ definitions:
         dataType:
           description:  data type of this analysis count or distribution
           type: string
+        results:
+          description: count results
+          type: array
+          items:
+            $ref: "#/definitions/AchillesResult"
 
   AnalysisListResponse:
       type: object

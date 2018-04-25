@@ -81,23 +81,19 @@ public class DataBrowserController implements DataBrowserApiDelegate {
             new Function<QuestionConcept, org.pmiops.workbench.model.QuestionConcept>() {
                 @Override
                 public org.pmiops.workbench.model.QuestionConcept apply(QuestionConcept concept) {
-                    //org.pmiops.workbench.model.QuestionConcept ret   = new org.pmiops.workbench.model.QuestionConcept()
-                    return new org.pmiops.workbench.model.QuestionConcept()
+                    org.pmiops.workbench.model.QuestionConcept ret   = new org.pmiops.workbench.model.QuestionConcept();
 
-                            .conceptId(concept.getConceptId())
+                            ret.conceptId(concept.getConceptId())
                             .conceptName(concept.getConceptName())
-                            .standardConcept(concept.getStandardConcept())
                             .conceptCode(concept.getConceptCode())
-                            .conceptClassId(concept.getConceptClassId())
-                            .vocabularyId(concept.getVocabularyId())
                             .domainId(concept.getDomainId())
                             .countValue(concept.getCountValue())
                             .prevalence(concept.getPrevalence());
 
-                    //List<org.pmiops.workbench.model.AchillesResult> answers = concept.getAnswers().stream().map(TO_CLIENT_ACHILLESRESULT).collect(Collectors.toList());
-                    //ret.answers(answers);
+                    List<org.pmiops.workbench.model.AchillesResult> answers = concept.getAnswers().stream().map(TO_CLIENT_ACHILLESRESULT).collect(Collectors.toList());
+                    ret.answers(answers);
 
-                    //return ret;
+                    return ret;
 
                 }
             };
@@ -212,9 +208,13 @@ public class DataBrowserController implements DataBrowserApiDelegate {
             new Function<AchillesResult, org.pmiops.workbench.model.AchillesResult>() {
                 @Override
                 public org.pmiops.workbench.model.AchillesResult apply(AchillesResult o) {
+                    AchillesAnalysis a = o.getAnalysis();
+                    org.pmiops.workbench.model.Analysis analysis = TO_CLIENT_ANALYSIS.apply(a);
+
                     return new org.pmiops.workbench.model.AchillesResult()
                             .id(o.getId())
                             .analysisId(o.getAnalysisId())
+                            .analysis(analysis)
                             .stratum1(o.getStratum1())
                             .stratum2(o.getStratum2())
                             .stratum3(o.getStratum3())
@@ -379,18 +379,28 @@ public class DataBrowserController implements DataBrowserApiDelegate {
 
 
     @Override
-    public ResponseEntity<ConceptListResponse> getSurveyQuestions5() {
+    public ResponseEntity<QuestionConceptListResponse> getSurveyQuestions5() {
         // 1586134
-        List<QuestionConcept> resultList = questionConceptDao.findSurveyQuestions5(1586134);
+        // 1585929 -- State question
+        long aid = 3110;
+        Integer qid = 1585929;
+        List<QuestionConcept> resultList = questionConceptDao.findSurveyQuestions5(qid);
         QuestionConcept o = resultList.get(0);
         List<AchillesResult> answers = o.getAnswers();
-        System.out.println(o.toString());
+        System.out.println(o.getConceptName());
         AchillesResult a = answers.get(0);
-        System.out.println(a.toString());
-        ConceptListResponse resp = new ConceptListResponse();
-        //resp.setItems(resultList.stream().map(TO_CLIENT_QUESTION_CONCEPT).collect(Collectors.toList()));
+        System.out.println(a.getStratum4());
+        QuestionConceptListResponse resp = new QuestionConceptListResponse();
+        resp.setItems(resultList.stream().map(TO_CLIENT_QUESTION_CONCEPT).collect(Collectors.toList()));
         return ResponseEntity.ok(resp);
 
+    }
+    public ResponseEntity<Analysis> getAnalysisSurveyQuestion(Long analysisId, String stratum2) {
+        //long aid = 3110;
+        //String qid = "1585929";
+        AchillesAnalysis a = achillesAnalysisDao.findAchillesAnalysisByAnalysisId(analysisId);
+        Analysis resp = TO_CLIENT_ANALYSIS.apply(a);
+        return ResponseEntity.ok(resp);
     }
 
 }

@@ -6,10 +6,11 @@ import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 import {ClarityModule} from '@clr/angular';
 
+import {ProfileStorageService} from 'app/services/profile-storage.service';
 import {ServerConfigService} from 'app/services/server-config.service';
 import {WorkspaceShareComponent} from 'app/views/workspace-share/component';
 
-import {ProfileServiceStub} from 'testing/stubs/profile-service-stub';
+import {ProfileStorageServiceStub} from 'testing/stubs/profile-storage-service-stub';
 import {ServerConfigServiceStub} from 'testing/stubs/server-config-service-stub';
 import {WorkspacesServiceStub, WorkspaceStubVariables} from 'testing/stubs/workspace-service-stub';
 import {
@@ -20,7 +21,6 @@ import {
   updateAndTick
 } from 'testing/test-helpers';
 
-import {ProfileService} from 'generated';
 import {UserRole} from 'generated';
 import {WorkspaceAccessLevel} from 'generated';
 import {WorkspacesService} from 'generated';
@@ -91,7 +91,7 @@ describe('WorkspaceShareComponent', () => {
       providers: [
         { provide: WorkspacesService, useValue: new WorkspacesServiceStub() },
         { provide: ActivatedRoute, useValue: activatedRouteStub },
-        { provide: ProfileService, useValue: new ProfileServiceStub() },
+        { provide: ProfileStorageService, useValue: new ProfileStorageServiceStub() },
         {
           provide: ServerConfigService,
           useValue: new ServerConfigServiceStub({
@@ -100,7 +100,8 @@ describe('WorkspaceShareComponent', () => {
         }
       ]}).compileComponents().then(() => {
         workspaceSharePage = new WorkspaceSharePage(TestBed);
-      });
+        workspaceSharePage.fixture.componentRef.instance.profileStorageService.reload();
+    });
       tick();
   }));
 
@@ -145,5 +146,56 @@ describe('WorkspaceShareComponent', () => {
         .toEqual(WorkspaceAccessLevel.OWNER);
   }));
 
+  it('validates and allows usernames', fakeAsync(() => {
+    spyOn(TestBed.get(WorkspacesService), 'shareWorkspace')
+      .and.callThrough();
 
+    const userValues = {
+      workspaceEtag: undefined,
+      items: [
+        { email: 'sampleuser1@fake-research-aou.org', role: 'OWNER' },
+        { email: 'sampleuser2@fake-research-aou.org', role: 'WRITER' },
+        { email: 'sampleuser3@fake-research-aou.org', role: 'READER' },
+        { email: 'sampleuser4@fake-research-aou.org', role: 'WRITER' }
+      ]
+    };
+
+    workspaceSharePage.readPageData();
+    simulateInput(workspaceSharePage.fixture, workspaceSharePage.emailField, 'sampleuser4');
+    workspaceSharePage.fixture.componentRef.instance.setAccess('Writer');
+
+
+    simulateClick(workspaceSharePage.fixture,
+      queryByCss(workspaceSharePage.fixture, '.add-button'));
+    workspaceSharePage.readPageData();
+    expect(TestBed.get(WorkspacesService).shareWorkspace)
+        .toHaveBeenCalledWith('defaultNamespace', '1', userValues);
+  }));
+
+  it('validates and allows email addresses', fakeAsync(() => {
+    spyOn(TestBed.get(WorkspacesService), 'shareWorkspace')
+      .and.callThrough();
+
+    const userValues = {
+      workspaceEtag: undefined,
+      items: [
+        { email: 'sampleuser1@fake-research-aou.org', role: 'OWNER' },
+        { email: 'sampleuser2@fake-research-aou.org', role: 'WRITER' },
+        { email: 'sampleuser3@fake-research-aou.org', role: 'READER' },
+        { email: 'sampleuser4@fake-research-aou.org', role: 'WRITER' }
+      ]
+    };
+
+    workspaceSharePage.readPageData();
+    simulateInput(workspaceSharePage.fixture, workspaceSharePage.emailField,
+      'sampleuser4@fake-research-aou.org');
+    workspaceSharePage.fixture.componentRef.instance.setAccess('Writer');
+
+
+    simulateClick(workspaceSharePage.fixture,
+      queryByCss(workspaceSharePage.fixture, '.add-button'));
+    workspaceSharePage.readPageData();
+    expect(TestBed.get(WorkspacesService).shareWorkspace)
+      .toHaveBeenCalledWith('defaultNamespace', '1', userValues);
+  }));
 });

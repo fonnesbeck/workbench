@@ -137,45 +137,12 @@ public class CohortBuilderController implements CohortBuilderApiDelegate {
                                                                           String domain,
                                                                           String value,
                                                                           Long conceptId) {
-      boolean test1 = true;
         CdrVersionContext.setCdrVersion(cdrVersionDao.findOne(cdrVersionId));
         List<ConceptCriteria> criteriaList = new ArrayList<>();
-
-        if (test1) {
-          if (conceptId == null) {
+        if (conceptId == null) {
             criteriaList = criteriaDao.findConceptCriteriaParent(domain, "[[:<:]]" + value + "[[:>:]]");
-          } else {
-            criteriaList = criteriaDao.findConceptCriteriaChildren(conceptId, domain, "[[:<:]]" + value + "[[:>:]]");
-          }
         } else {
-          if (conceptId == null) {
-            criteriaList = criteriaDao.findConceptCriteriaParent1(domain, "[[:<:]]" + value + "[[:>:]]");
-          } else {
-            criteriaList = criteriaDao.findConceptCriteriaChildren1(conceptId, domain);
-            List<String> conceptNames = new ArrayList<>();
-            String maxLevels = "";
-            String oldMaxLevels = "";
-            for (ConceptCriteria conceptCriteria : criteriaList) {
-              if (maxLevels.isEmpty()) {
-                maxLevels = conceptCriteria.getIsGroup();
-                conceptNames.add(conceptCriteria.getConceptName());
-              } else {
-                maxLevels = conceptCriteria.getIsGroup();
-                if (maxLevels.equals(oldMaxLevels)) {
-                  for (String name : conceptNames) {
-                    name = " | " + name;
-                  }
-                } else {
-                  conceptNames.add(conceptCriteria.getConceptName());
-                }
-              }
-              oldMaxLevels = maxLevels;
-            }
-            for (String name : conceptNames) {
-              criteriaList = new ArrayList<>();
-              criteriaList.add(new TestConcept(0, name, "0"));
-            }
-          }
+            criteriaList = criteriaDao.findConceptCriteriaChildren(conceptId, domain, "[[:<:]]" + value + "[[:>:]]");
         }
 
         ConceptCriteriaListResponse conceptCriteriaListResponse = new ConceptCriteriaListResponse();
@@ -191,33 +158,6 @@ public class CohortBuilderController implements CohortBuilderApiDelegate {
 
         return ResponseEntity.ok(conceptCriteriaListResponse);
     }
-
-  class TestConcept implements ConceptCriteria {
-      private Integer conceptId;
-      private String conceptName;
-      private String isGroup;
-
-      public TestConcept(Integer conceptId, String conceptName, String isGroup) {
-        this.conceptId = conceptId;
-        this.conceptName = conceptName;
-        this.isGroup = isGroup;
-      }
-
-    @Override
-    public Integer getConceptId() {
-      return conceptId;
-    }
-
-    @Override
-    public String getConceptName() {
-      return conceptName;
-    }
-
-    @Override
-    public String getIsGroup() {
-      return isGroup;
-    }
-  }
 
     @Override
     public ResponseEntity<ParticipantDemographics> getParticipantDemographics(Long cdrVersionId) {

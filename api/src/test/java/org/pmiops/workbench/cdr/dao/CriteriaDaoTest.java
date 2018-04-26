@@ -141,13 +141,6 @@ public class CriteriaDaoTest {
         assertEquals("Condition", icd10DomainList.get(0));
     }
 
-    @Test
-    public void findConceptCriteriaParent() throws Exception {
-        String domainId = "Condition";
-        String value = "^arthritis$";
-        final List<ConceptCriteria> conceptCriteriaList = criteriaDao.findConceptCriteriaParent(domainId, value);
-    }
-
     private Criteria createCriteria(String type, String subtype, String code, String name, long parentId, boolean group, boolean selectable) {
         return new Criteria()
                 .code(code)

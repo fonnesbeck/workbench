@@ -8,6 +8,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.pmiops.workbench.cdr.dao.CriteriaDao;
 import org.pmiops.workbench.db.dao.CdrVersionDao;
 import org.pmiops.workbench.db.model.CdrVersion;
+import org.pmiops.workbench.model.ConceptCriteriaListResponse;
 import org.pmiops.workbench.model.Criteria;
 import org.pmiops.workbench.model.CriteriaListResponse;
 import org.springframework.http.HttpStatus;
@@ -229,39 +230,6 @@ public class CohortBuilderControllerMockTest {
 
         verify(mockCdrVersionDao).findOne(1L);
         verify(mockCriteriaDao).findCriteriaByTypeAndSubtypeOrderByNameAsc("DEMO", "RACE");
-        verifyNoMoreInteractions(mockCriteriaDao, mockCdrVersionDao);
-    }
-
-    @Test
-    public void getCriteriaTreeQuickSearch() throws Exception {
-        org.pmiops.workbench.cdr.model.Criteria expectedCriteria =
-                new org.pmiops.workbench.cdr.model.Criteria()
-                        .id(1L)
-                        .type("PHECODE")
-                        .name("Intestinal infection")
-                        .group(true)
-                        .selectable(true)
-                        .count("0")
-                        .conceptId("0");
-
-        when(mockCdrVersionDao.findOne(1L)).thenReturn(new CdrVersion());
-        when(mockCriteriaDao
-                .findCriteriaByTypeAndNameOrCode("PHECODE", "infect*"))
-                .thenReturn(Arrays.asList(expectedCriteria));
-
-        assertCriteria(
-                controller.getCriteriaTreeQuickSearch(1L,"PHECODE", "infect", null),
-                new Criteria()
-                        .id(1L)
-                        .type("PHECODE")
-                        .name("Intestinal infection")
-                        .group(true)
-                        .selectable(true)
-                        .count(0L)
-                        .conceptId(0L));
-
-        verify(mockCdrVersionDao).findOne(1L);
-        verify(mockCriteriaDao).findCriteriaByTypeAndNameOrCode("PHECODE", "infect*");
         verifyNoMoreInteractions(mockCriteriaDao, mockCdrVersionDao);
     }
 

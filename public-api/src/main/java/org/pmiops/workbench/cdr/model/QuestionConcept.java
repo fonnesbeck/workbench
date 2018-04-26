@@ -4,6 +4,7 @@ package org.pmiops.workbench.cdr.model;
 import org.pmiops.workbench.cdr.model.AchillesResult;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,6 +21,7 @@ public class QuestionConcept {
     private long countValue;
     private float prevalence;
     private List<AchillesResult> answers;
+    private List<AchillesAnalysis> analyses = new ArrayList<>();
 
     @Id
     @Column(name = "concept_id")
@@ -117,6 +119,40 @@ public class QuestionConcept {
     public QuestionConcept answers(List<AchillesResult> answers) {
         this.answers = answers;
         return this;
+    }
+
+    @Transient
+    public List<AchillesAnalysis> getAnalyses() {
+        return analyses;
+    }
+    public void setAnalyses(List<AchillesAnalysis> analyses) {
+        this.analyses = analyses;
+    }
+    public QuestionConcept analyses(List<AchillesAnalysis> analyses) {
+        this.analyses = analyses;
+        return this;
+    }
+
+    public AchillesAnalysis getAnalysisWithAnswers(long analysisId) {
+        List<AchillesResult> allAnswers = this.getAnswers();
+        List<AchillesResult> results = new ArrayList<>();
+        AchillesAnalysis a = new AchillesAnalysis();
+
+        for (AchillesResult r : allAnswers) {
+            if (r.getAnalysisId() == analysisId) {
+                results.add(r);
+            }
+        }
+        // Pull analysis object off first result
+        if (!results.isEmpty()) {
+            a = results.get(0).getAnalysis();
+            a.setResults(results);
+            AchillesResult ar = a.getResults().get(0);
+        } else {
+            a.setAnalysisId(analysisId);
+            a.setResults(results);
+        }
+        return a;
     }
 
 }

@@ -141,13 +141,15 @@ public class AchillesAnalysis {
     public List<AchillesResult> getResults() {
         return results;
     }
-    public void setResults(List<AchillesResult> answers) {
+    public void setResults(List<AchillesResult> results) {
         this.results = results;
     }
     public AchillesAnalysis results(List<AchillesResult> results) {
         this.results = results;
         return this;
     }
+
+
 
     @Override
     public boolean equals(Object o) {

@@ -387,7 +387,6 @@ public class DataBrowserController implements DataBrowserApiDelegate {
         return ResponseEntity.ok(resp);
     }
 
-
     @Override
     public ResponseEntity<QuestionConceptListResponse> getSurveyQuestions5() {
         // 1586134
@@ -426,14 +425,21 @@ public class DataBrowserController implements DataBrowserApiDelegate {
         //long aid = 3110;
         //String qid = "1585929";
 
-        List<AchillesAnalysis> alist = achillesAnalysisDao.findByResults_Stratum2(stratum2);
-        AchillesAnalysis a1 = alist.get(0);
-        AchillesResult r1 = a1.getResults().get(0);
-        System.out.println("Args: analysisId " + analysisId + " stratum2 " + stratum2 + " Result:  stratum2   " + r1.getStratum2() + " analysisId " + r1.getAnalysisId());
-        AchillesAnalysis a2 = achillesAnalysisDao.findResultsByStratum2(analysisId, stratum2);
-        Analysis resp = TO_CLIENT_ANALYSIS.apply(a2);
-        resp.setStratum2(stratum2);
+        List<AchillesAnalysis> alist = achillesAnalysisDao.findQuestionAnalysisResults(stratum2);
+        Analysis resp = new Analysis();
+        if (!alist.isEmpty()) {
+            AchillesAnalysis a1 = alist.get(0);
+            resp = TO_CLIENT_ANALYSIS.apply(a1);
+            resp.setStratum2(stratum2);
+        }
+        return ResponseEntity.ok(resp);
+    }
 
+    @Override
+    public ResponseEntity<AnalysisListResponse> getQuestionAnalyses(String surveyConceptId, String questionConceptId) {
+        List<AchillesAnalysis> results = achillesAnalysisDao.findQuestionAnalysisResults(surveyConceptId, questionConceptId);
+        AnalysisListResponse resp = new AnalysisListResponse();
+        resp.setItems(results.stream().map(TO_CLIENT_ANALYSIS).collect(Collectors.toList()));
         return ResponseEntity.ok(resp);
     }
 

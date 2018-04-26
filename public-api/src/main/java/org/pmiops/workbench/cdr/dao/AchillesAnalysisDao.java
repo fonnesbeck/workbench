@@ -17,11 +17,16 @@ public interface AchillesAnalysisDao extends CrudRepository<AchillesAnalysis, Lo
     List<AchillesAnalysis> findByResults_Stratum2(String stratum2);
     AchillesAnalysis findAchillesAnalysisByAnalysisIdAndResults_Stratum2(long analysisId, String stratum2);
 
-    @Query(value = "select a.*, r.* " +
-            "from achilles_analysis a left outer join achilles_results r on a.analysis_id = r.analysis_id " +
-            "where a.analysis_id = :analysisId and r.stratum_2 = :stratum2 limit 5",
-            nativeQuery = true)
-    AchillesAnalysis findResultsByStratum2(@Param("analysisId") long analysisId, @Param("stratum2") String stratum2);
+
+    @Query(value = "select a from AchillesAnalysis a left join FETCH a.results as r " +
+            "where a.analysisId = ?1  and r.stratum2 = ?2"
+            )
+    AchillesAnalysis findResultsByStratum2(long analysisId, String stratum2);
+
+    @Query(value = "select a from AchillesAnalysis a left join FETCH a.results as r " +
+            "where r.stratum1 = ?1 and r.stratum2 = ?2"
+    )
+    List<AchillesAnalysis>findQuestionAnalysisResults(String survey_concept_id, String question_concept_id);
 
 }
 

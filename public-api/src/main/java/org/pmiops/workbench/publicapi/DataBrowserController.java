@@ -136,7 +136,10 @@ public class DataBrowserController implements DataBrowserApiDelegate {
             new Function<AchillesAnalysis, org.pmiops.workbench.model.Analysis>() {
                 @Override
                 public org.pmiops.workbench.model.Analysis apply(org.pmiops.workbench.cdr.model.AchillesAnalysis cdr) {
-                    List<org.pmiops.workbench.model.AchillesResult> results = cdr.getResults().stream().map(TO_CLIENT_ACHILLES_RESULT).collect(Collectors.toList());
+                    List<org.pmiops.workbench.model.AchillesResult> results = new ArrayList<>();
+                    if (!cdr.getResults().isEmpty()) {
+                        results = cdr.getResults().stream().map(TO_CLIENT_ACHILLES_RESULT).collect(Collectors.toList());
+                    }
 
                     return new org.pmiops.workbench.model.Analysis()
                             .analysisId(cdr.getAnalysisId())

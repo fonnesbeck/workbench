@@ -19,7 +19,7 @@ public interface AchillesAnalysisDao extends CrudRepository<AchillesAnalysis, Lo
 
     @Query(value = "select a.*, r.* " +
             "from achilles_analysis a left outer join achilles_results r on a.analysis_id = r.analysis_id " +
-            "where a.analysis_id = :analysisId and r.stratum_2 = stratum2",
+            "where a.analysis_id = :analysisId and r.stratum_2 = :stratum2 limit 5",
             nativeQuery = true)
     AchillesAnalysis findResultsByStratum2(@Param("analysisId") long analysisId, @Param("stratum2") String stratum2);
 

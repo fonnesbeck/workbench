@@ -23,7 +23,7 @@ public interface AchillesAnalysisDao extends CrudRepository<AchillesAnalysis, Lo
             )
     AchillesAnalysis findResultsByStratum2(long analysisId, String stratum2);
 
-    @Query(value = "select a from AchillesAnalysis a left join FETCH a.results as r " +
+    @Query(value = "select distinct a from AchillesAnalysis a left join FETCH a.results as r " +
             "where r.stratum1 = ?1 and r.stratum2 = ?2"
     )
     List<AchillesAnalysis>findQuestionAnalysisResults(String survey_concept_id, String question_concept_id);

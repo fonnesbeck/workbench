@@ -424,8 +424,9 @@ public class DataBrowserController implements DataBrowserApiDelegate {
     public ResponseEntity<Analysis> getAnalysisSurveyQuestion(Long analysisId, String stratum2) {
         //long aid = 3110;
         //String qid = "1585929";
+        String survey_id = "1585710";
 
-        List<AchillesAnalysis> alist = achillesAnalysisDao.findQuestionAnalysisResults(stratum2, stratum2);
+        List<AchillesAnalysis> alist = achillesAnalysisDao.findQuestionAnalysisResults("1585710", stratum2);
         Analysis resp = new Analysis();
         if (!alist.isEmpty()) {
             AchillesAnalysis a1 = alist.get(0);

@@ -20,7 +20,6 @@ public class QuestionConcept {
     private String domainId;
     private long countValue;
     private float prevalence;
-    private List<AchillesResult> answers;
     private List<AchillesAnalysis> analyses = new ArrayList<>();
 
     @Id
@@ -133,6 +132,7 @@ public class QuestionConcept {
         return this;
     }
 
+    /*
     public AchillesAnalysis getAnalysisWithAnswers(long analysisId) {
         List<AchillesResult> allAnswers = this.getAnswers();
         List<AchillesResult> results = new ArrayList<>();
@@ -154,5 +154,5 @@ public class QuestionConcept {
         }
         return a;
     }
-
+    */
 }

@@ -107,7 +107,7 @@ public class QuestionConcept {
         return this;
     }
 
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    /*@OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name="stratum_2")
     public List<AchillesResult> getAnswers() {
         return answers;
@@ -118,7 +118,7 @@ public class QuestionConcept {
     public QuestionConcept answers(List<AchillesResult> answers) {
         this.answers = answers;
         return this;
-    }
+    }*/
 
     @Transient
     public List<AchillesAnalysis> getAnalyses() {

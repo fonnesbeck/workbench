@@ -8,6 +8,7 @@ import java.util.List;
 public interface DbDomainDao extends CrudRepository<DbDomain, Long> {
     // TODO -- maybe add order by
     List<DbDomain> findAll();
+    DbDomain findByConceptId(long conceptId);
 
     @Query(nativeQuery=true, value="SELECT * from db_domain where db_type='survey' and concept_id <> 0 order by domain_desc")
     List<DbDomain> findSurveyList();

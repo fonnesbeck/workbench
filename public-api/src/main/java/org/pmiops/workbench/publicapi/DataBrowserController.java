@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.EntityManager;
 import java.io.File;
 
 import java.io.FileNotFoundException;
@@ -42,6 +43,9 @@ public class DataBrowserController implements DataBrowserApiDelegate {
 
     @Autowired
     private DbDomainDao dbDomainDao;
+
+    @Autowired
+    private EntityManager entityManager;
 
     public static final long PARTICIPANT_COUNT_ANALYSIS_ID = 1;
     public static final long COUNT_ANALYSIS_ID = 3000;
@@ -82,26 +86,16 @@ public class DataBrowserController implements DataBrowserApiDelegate {
                 @Override
                 public org.pmiops.workbench.model.QuestionConcept apply(QuestionConcept concept) {
                     List<AchillesAnalysis> alist = concept.getAnalyses();
-                    if (!alist.isEmpty())
-                    {
-                        System.out.println("A list not empty ");
+                    List<org.pmiops.workbench.model.Analysis> analyses = alist.stream().map(TO_CLIENT_ANALYSIS).collect(Collectors.toList());
 
-                    }
-                    List<org.pmiops.workbench.model.Analysis> analyses = concept.getAnalyses().stream().map(TO_CLIENT_ANALYSIS).collect(Collectors.toList());
-
-                    org.pmiops.workbench.model.QuestionConcept ret   = new org.pmiops.workbench.model.QuestionConcept();
-
-                            ret.conceptId(concept.getConceptId())
+                    return new org.pmiops.workbench.model.QuestionConcept()
+                            .conceptId(concept.getConceptId())
                             .conceptName(concept.getConceptName())
                             .conceptCode(concept.getConceptCode())
                             .domainId(concept.getDomainId())
                             .countValue(concept.getCountValue())
                             .prevalence(concept.getPrevalence())
                             .analyses(analyses);
-
-
-                    return ret;
-
                 }
             };
 
@@ -380,60 +374,39 @@ public class DataBrowserController implements DataBrowserApiDelegate {
     }
 
 
-    @Override
-    public ResponseEntity<SurveyResult> getSurveyResults(Long surveyConceptId, Long analysisId) {
 
-        SurveyResult resp = new SurveyResult();
-        return ResponseEntity.ok(resp);
-    }
 
     @Override
-    public ResponseEntity<QuestionConceptListResponse> getSurveyQuestions5() {
-        // 1586134
-        // 1585929 -- State question
-        long countAid = 3110;
-        long genderAid = 3111;
-        long ageAid = 3112;
-
-        Integer qid = 1585929;
-        List<QuestionConcept> resultList = questionConceptDao.findSurveyQuestions5(qid);
-
-        QuestionConcept o = resultList.get(0);
-        AchillesAnalysis countAnalysis = o.getAnalysisWithAnswers(countAid);
-        //countAnalysis.results().out.println()
-        AchillesAnalysis genderAnalysis = o.getAnalysisWithAnswers(genderAid);
-        AchillesAnalysis ageAnalysis = o.getAnalysisWithAnswers(ageAid);
-
-        o.getAnalyses().add(countAnalysis);
-        o.getAnalyses().add(genderAnalysis);
-        o.getAnalyses().add(ageAnalysis);
-
-
-        //List<AchillesResult> answers = o.getAnswers();
-        System.out.println(o.getConceptName());
-        //AchillesResult a = answers.get(0);
-        AchillesAnalysis a = o.getAnalyses().get(0);
-        System.out.println(a.getAnalysisName());
-
+    public ResponseEntity<QuestionConceptListResponse> getSurveyResults(String surveyConceptId) {
+        long longSurveyConceptId = Long.parseLong(surveyConceptId);
+        List<QuestionConcept> questions = questionConceptDao.findSurveyQuestions(longSurveyConceptId);
         QuestionConceptListResponse resp = new QuestionConceptListResponse();
-        resp.setItems(resultList.stream().map(TO_CLIENT_QUESTION_CONCEPT).collect(Collectors.toList()));
-        return ResponseEntity.ok(resp);
+        DbDomain survey = dbDomainDao.findByConceptId(longSurveyConceptId);
+        resp.setSurvey(TO_CLIENT_DBDOMAIN.apply(survey));
 
-    }
-    @Override
-    public ResponseEntity<Analysis> getAnalysisSurveyQuestion(Long analysisId, String stratum2) {
-        //long aid = 3110;
-        //String qid = "1585929";
-        String survey_id = "1585710";
+        if (!questions.isEmpty()) {
+            for (int x = 0; x < questions.size() - 1; x++)  {
+                QuestionConcept q = questions.get(x);
+                String qid = Long.toString(q.getConceptId());
 
-        List<AchillesAnalysis> alist = achillesAnalysisDao.findQuestionAnalysisResults("1585710", stratum2);
-        Analysis resp = new Analysis();
-        if (!alist.isEmpty()) {
-            AchillesAnalysis a1 = alist.get(0);
-            resp = TO_CLIENT_ANALYSIS.apply(a1);
-            resp.setStratum2(stratum2);
+                /*** Important -- when calling these dao functions in a loop, baceause the analyses share same id ,
+                 * and we are filtering by a property in the related reluslts table, the first results get cached and
+                 * put on all questions. So we have to detach the entity from the session
+                 */
+                List<AchillesAnalysis> analyses = achillesAnalysisDao.findQuestionAnalysisResults(surveyConceptId, qid);
+                //THIS IS THE IMPORTANT PART
+                //You have to detach the entity from the session otherwise all the results are same as the first
+                // question... Thank you https://stackoverflow.com/a/49452056/2627999
+                analyses.forEach(analysis -> {
+                     this.entityManager.detach(analysis);
+                });
+                q.setAnalyses(analyses);
+            }
+
         }
+        resp.setItems(questions.stream().map(TO_CLIENT_QUESTION_CONCEPT).collect(Collectors.toList()));
         return ResponseEntity.ok(resp);
+
     }
 
     @Override

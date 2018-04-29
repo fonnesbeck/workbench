@@ -54,6 +54,26 @@ paths:
           schema:
             $ref: "#/definitions/AnalysisListResponse"
 
+  /v1/databrowser/survey-results:
+    get:
+      security: []
+      tags:
+        - dataBrowser
+
+      description: Gets list of quetions with results for a survey
+      operationId: "getSurveyResults"
+      parameters:
+        - in: query
+          name: survey_concept_id
+          type: string
+          required: true
+          description: survey concept id
+      responses:
+        200:
+          description: A collection of survey modules
+          schema:
+            $ref: "#/definitions/QuestionConceptListResponse"
+
   /v1/databrowser/search-concepts:
     get:
       security: []
@@ -139,31 +159,6 @@ paths:
           description: A collection of analysis definitions
           schema:
             $ref: "#/definitions/AnalysisListResponse"
-  /v1/databrowser/analysis-question:
-    get:
-      security: []
-      tags:
-        - dataBrowser
-
-      description: Gets list of analysis and results by analysis id and question concept id
-      operationId: "getAnalysisSurveyQuestion"
-      parameters:
-        - in: query
-          name: analysis_id
-          type: integer
-          format: int64
-          required: true
-          description: analysis_id
-        - in: query
-          name: stratum_2
-          type: string
-          required: false
-          description: stratum 2
-      responses:
-        200:
-          description: An analysis with results
-          schema:
-            $ref: "#/definitions/Analysis"
 
   /v1/databrowser/participant-count:
     get:
@@ -255,20 +250,7 @@ paths:
           schema:
             $ref: "#/definitions/DbDomainListResponse"
 
-  /v1/databrowser/survey-questions:
-    get:
-      security: []
-      tags:
-        - dataBrowser
 
-      description: Gets list of survey modules
-      operationId: "getSurveyQuestions5"
-      parameters: []
-      responses:
-        200:
-          description: A collection of survey modules
-          schema:
-            $ref: "#/definitions/QuestionConceptListResponse"
 
   /v1/databrowser/survey-list:
       get:
@@ -326,34 +308,6 @@ paths:
             description: A collection of databrowser domains
             schema:
               $ref: "#/definitions/ConceptListResponse"
-
-  /v1/databrowser/survey-results:
-      get:
-        security: []
-        tags:
-            - dataBrowser
-
-        description: Gets survey result of particular survey concept id
-        operationId: "getSurveyResults"
-        parameters:
-          - in: query
-            name: survey_concept_id
-            type: integer
-            format: int64
-            required: true
-            description: concept id to get relevant questions
-          - in: query
-            name: analysis_id
-            type: integer
-            format: int64
-            required: true
-            description: analysis id
-        responses:
-          200:
-            description: survey result with collection of survey questions and answers
-            schema:
-              $ref: "#/definitions/SurveyResult"
-
 
 
 
@@ -445,11 +399,6 @@ definitions:
         description: prevalence among participants percent count divided num participants
         type: number
         format: float
-      answers:
-        description: answers to questions
-        type: array
-        items:
-          $ref: "#/definitions/AchillesResult"
       analyses:
         description: analyses with answer results to questions
         type: array
@@ -461,10 +410,15 @@ definitions:
     required:
       - items
     properties:
+      survey:
+        $ref: "#/definitions/DbDomain"
       items:
-        type: "array"
+        type: array
         items:
           $ref: "#/definitions/QuestionConcept"
+
+
+
 
 
   AnalysisResult:
@@ -676,95 +630,6 @@ definitions:
         items:
           $ref: "#/definitions/DbDomain"
 
-  SurveyAnswer:
-    type: object
-    required:
-      - questionConceptId
-    properties:
-      answerConceptId:
-        description: concept id of answer
-        type: string
-      answerValue:
-        description: concept name of answer
-        type: string
-      stratum_count:
-        description: list of stratums and respective count values
-        type: "array"
-        items:
-          $ref: "#/definitions/StratumCount"
-
-  SurveyAnswerList:
-    type: object
-    required:
-      - items
-    properties:
-      items:
-        type: "array"
-        items:
-          $ref: "#/definitions/SurveyAnswer"
-
-  SurveyQuestion:
-    type: object
-    required:
-      - surveyConceptId
-    properties:
-      questionConceptId:
-        description: concept id of question
-        type: string
-      questionValue:
-        description: concept name of question
-        type: string
-      answers:
-        description: list of answers to the survey question
-        type: "array"
-        items:
-          $ref: "#/definitions/SurveyAnswer"
-
-  SurveyQuestionList:
-    type: object
-    required:
-      - items
-    properties:
-      items:
-        type: "array"
-        items:
-          $ref: "#/definitions/SurveyQuestion"
-
-  StratumCount:
-    type: object
-    required:
-      - answerConceptId
-    properties:
-      stratum_5:
-        description: stratum 5 value (gender concept id / age decile)
-        type: string
-      count_value:
-        description: count of number of participants who gave same answer
-        type: integer
-        format: int64
-
-
-  SurveyResult:
-    type: object
-    required:
-      - surveyConceptId
-    properties:
-      surveyConceptID:
-        description: concept id of survey module
-        type: string
-      analysisID:
-        description: analysis id
-        type: integer
-        format: int64
-      questions:
-        description: survey questions of this module
-        type: "array"
-        items:
-          $ref: "#/definitions/SurveyQuestion"
-      numParticipants:
-        description: number of people that participated in the survey
-        type: integer
-        format: int64
 
 
 

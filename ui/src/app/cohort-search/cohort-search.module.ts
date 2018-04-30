@@ -24,6 +24,8 @@ import {SearchGroupListComponent} from './search-group-list/search-group-list.co
 import {SearchGroupSelectComponent} from './search-group-select/search-group-select.component';
 import {SearchGroupComponent} from './search-group/search-group.component';
 import {SelectionInfoComponent} from './selection-info/selection-info.component';
+import {StandardNodeComponent} from './standard-node/standard-node.component';
+import {StandardSearchComponent} from './standard-search/standard-search.component';
 import {TreeComponent} from './tree/tree.component';
 
 /* Other Objects */
@@ -66,6 +68,8 @@ const routes: Routes = [{
     SearchGroupListComponent,
     SearchGroupSelectComponent,
     SelectionInfoComponent,
+    StandardNodeComponent,
+    StandardSearchComponent,
     TreeComponent,
   ],
   exports: [

@@ -509,6 +509,9 @@ definitions:
       stratum5:
         description: stratum 5
         type: string
+      stratum5Name:
+        description: stratum 5 Name
+        type: string
       countValue:
         description: count
         type: integer

@@ -123,6 +123,16 @@ public class AchillesResult  {
         return this;
     }
 
+    public String getStratum5Name() {
+        return stratum5Name;
+    }
+    public void setStratum5Name(String stratum5Name) {
+        this.stratum5Name = stratum5Name;
+    }
+    public AchillesResult stratum5Name(String val) {
+        this.stratum5Name = val;
+        return this;
+    }
     @Column(name="count_value")
     public Long getCountValue() {
         return countValue;

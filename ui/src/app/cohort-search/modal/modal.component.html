@@ -37,6 +37,9 @@
     -->
     <div class="content" *ngIf="open">
       <ng-container [ngSwitch]="ctype">
+        <crit-standard-search *ngSwitchCase="'standard'">
+        </crit-standard-search>
+
         <crit-demographics *ngSwitchCase="'demo'"
           (cancel)="cancel()"
           (finish)="finish()">

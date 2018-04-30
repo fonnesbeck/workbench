@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 
 import {CohortBuilderService} from 'generated';
-import {CohortSearchActions} from '../../redux';
+import {CohortSearchActions} from '../redux';
 
 @Component({
   selector: 'crit-standard-node',

@@ -55,9 +55,39 @@ public class DataBrowserController implements DataBrowserApiDelegate {
     public static final long SURVEY_GENDER_ANALYSIS_ID = 3111;
     public static final long SURVEY_AGE_ANALYSIS_ID = 3112;
 
-    /*public Map<String, String> ageStratumNameMap  = getAgeStratumNameMap();
-    public Map<String, String> genderStratumNameMap = getGenderStratumNameMap();
-    */
+    public static Map<String, String> ageStratumNameMap  = new HashMap<String, String>();
+    public static Map<String, String> genderStratumNameMap = new HashMap<String, String>();
+
+
+    public void setAgeStratumNameMap() {
+        ageStratumNameMap.put("1", "0-18 yrs old");
+        ageStratumNameMap.put("2", "18-29 yrs old");
+        ageStratumNameMap.put("3", "30-39 yrs old");
+        ageStratumNameMap.put("4", "40-49 yrs old");
+        ageStratumNameMap.put("5", "50-59 yrs old");
+        ageStratumNameMap.put("6", "60-69 yrs old");
+        ageStratumNameMap.put("7", "70-79 yrs old");
+        ageStratumNameMap.put("8", "80-89 yrs old");
+        ageStratumNameMap.put("9", "90-99 yrs old");
+        ageStratumNameMap.put("10", "100-109 yrs old");
+        ageStratumNameMap.put("11", "110-119 yrs old");
+        ageStratumNameMap.put("12", "120-129 yrs old");
+        ageStratumNameMap.put("13", "130-139 yrs old");
+
+
+    }
+
+    public void setGenderStratumNameMap() {
+        /* This is to slow to use the db */
+        genderStratumNameMap.put("8507", "Male");
+        genderStratumNameMap.put("8532", "Female");
+        genderStratumNameMap.put("8521", "Other");
+        genderStratumNameMap.put("8551", "Unknown");
+        genderStratumNameMap.put("8570", "Ambiguous");
+
+    }
+
+
 
 
     private static final Logger log = Logger.getLogger(DataBrowserController.class.getName());
@@ -355,6 +385,11 @@ public class DataBrowserController implements DataBrowserApiDelegate {
 
     @Override
     public ResponseEntity<QuestionConceptListResponse> getSurveyResults(String surveyConceptId) {
+        /* Set up the age and gender names */
+        // Too slow and concept names wrong so we hardcode list
+        // List<Concept> genders = conceptDao.findByConceptClassId("Gender");
+        this.setAgeStratumNameMap();
+        this.setGenderStratumNameMap();
         long longSurveyConceptId = Long.parseLong(surveyConceptId);
         List<QuestionConcept> questions = questionConceptDao.findSurveyQuestions(longSurveyConceptId);
         QuestionConceptListResponse resp = new QuestionConceptListResponse();
@@ -378,12 +413,11 @@ public class DataBrowserController implements DataBrowserApiDelegate {
                     this.entityManager.detach(analysis);
                     for (AchillesResult r : analysis.getResults()) {
                         if (analysis.getAnalysisId() == SURVEY_AGE_ANALYSIS_ID) {
-                            r.setStratum5Name(this.getAgeStratumName(r.getStratum5()));
+                            r.setStratum5Name(this.ageStratumNameMap.get(r.getStratum5()));
                         }
                         if (analysis.getAnalysisId() == SURVEY_GENDER_ANALYSIS_ID) {
-                            r.setStratum5Name(this.getGenderStratumName(r.getStratum5()));
+                            r.setStratum5Name(this.genderStratumNameMap.get(r.getStratum5()));
                         }
-
                     }
 
                 });
@@ -404,48 +438,5 @@ public class DataBrowserController implements DataBrowserApiDelegate {
         return ResponseEntity.ok(resp);
     }
 
-
-
-    public Map<String,String> getAgeStratumNameMap() {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("1", "0-18 yrs old");
-        map.put("2", "18-29 yrs old");
-        map.put("3", "30-39 yrs old");
-        map.put("4", "40-49 yrs old");
-        map.put("5", "50-59 yrs old");
-        map.put("6", "60-69 yrs old");
-        map.put("7", "70-79 yrs old");
-        map.put("8", "80-89 yrs old");
-        map.put("9", "90-99 yrs old");
-        map.put("10", "100-109 yrs old");
-        map.put("11", "110-119 yrs old");
-        map.put("12", "120-129 yrs old");
-        map.put("13", "130-139 yrs old");
-
-        return map;
-    }
-
-    public String getAgeStratumName(String stratum) {
-        Map<String, String> map = this.getAgeStratumNameMap();
-        System.out.println(map.get(stratum));
-        return map.get(stratum);
-    }
-
-    public Map<String, String> getGenderStratumNameMap() {
-
-        List<Concept> genders = conceptDao.findByConceptClassId("Gender");
-        Map<String, String> map = new HashMap<String, String>();
-        for (Concept c : genders) {
-            Long cid = c.getConceptId();
-            map.put(cid.toString(), c.getConceptName());
-        }
-        return map;
-    }
-
-    public String getGenderStratumName(String stratum) {
-        Map<String, String> map = this.getGenderStratumNameMap();
-        System.out.println(map.get(stratum));
-        return map.get(stratum);
-    }
 
 }

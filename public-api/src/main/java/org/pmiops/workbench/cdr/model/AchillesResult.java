@@ -123,6 +123,7 @@ public class AchillesResult  {
         return this;
     }
 
+    @Transient
     public String getStratum5Name() {
         return stratum5Name;
     }
@@ -133,6 +134,7 @@ public class AchillesResult  {
         this.stratum5Name = val;
         return this;
     }
+
     @Column(name="count_value")
     public Long getCountValue() {
         return countValue;

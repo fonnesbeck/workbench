@@ -27,8 +27,7 @@ public class ObservationQueryBuilder implements ReviewQueryBuilder {
                     "left join `${projectId}.${dataSetId}.concept` c2 on ob.observation_source_concept_id = c2.concept_id\n" +
                     "join `${projectId}.${dataSetId}.person` p on ob.person_id = p.person_id\n" +
                     "where ob.person_id = @" + NAMED_PARTICIPANTID_PARAM + "\n" +
-                    "order by %s %s, observation_id\n" +
-                    "limit %d offset %d\n";
+                    "order by %s %s, observation_id\n";
 
     private static final String OBSERVATIONS_DETAIL_SQL_TEMPLATE =
       "select ob.observation_datetime as itemDate,\n" +

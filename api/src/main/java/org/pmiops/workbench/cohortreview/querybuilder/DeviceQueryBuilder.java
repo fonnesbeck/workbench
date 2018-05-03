@@ -23,8 +23,7 @@ public class DeviceQueryBuilder implements ReviewQueryBuilder {
       "left join `${projectId}.${dataSetId}.concept` c2 on de.device_source_concept_id = c2.concept_id\n" +
       "join `${projectId}.${dataSetId}.person` p on de.person_id = p.person_id\n" +
       "where de.person_id = @" + NAMED_PARTICIPANTID_PARAM + "\n" +
-      "order by %s %s, device_exposure_id\n" +
-      "limit %d offset %d\n";
+      "order by %s %s, device_exposure_id\n";
 
   private static final String DEVICES_DETAIL_SQL_TEMPLATE =
     "select de.device_exposure_start_datetime as itemDate,\n" +

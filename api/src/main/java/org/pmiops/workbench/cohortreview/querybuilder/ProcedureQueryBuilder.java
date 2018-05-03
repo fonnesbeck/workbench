@@ -27,8 +27,7 @@ public class ProcedureQueryBuilder implements ReviewQueryBuilder {
                     "left join `${projectId}.${dataSetId}.concept` c2 on po.procedure_source_concept_id = c2.concept_id\n" +
                     "join `${projectId}.${dataSetId}.person` p on po.person_id = p.person_id\n" +
                     "where po.person_id = @" + NAMED_PARTICIPANTID_PARAM + "\n" +
-                    "order by %s %s, procedure_occurrence_id\n" +
-                    "limit %d offset %d\n";
+                    "order by %s %s, procedure_occurrence_id\n";
 
     private static final String PROCEDURES_DETAIL_SQL_TEMPLATE =
       "select po.procedure_datetime as itemDate,\n" +

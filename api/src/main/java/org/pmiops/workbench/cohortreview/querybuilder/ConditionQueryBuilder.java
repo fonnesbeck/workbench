@@ -27,8 +27,7 @@ public class ConditionQueryBuilder implements ReviewQueryBuilder {
                     "left join `${projectId}.${dataSetId}.concept` c2 on co.condition_source_concept_id = c2.concept_id\n" +
                     "join `${projectId}.${dataSetId}.person` p on co.person_id = p.person_id\n" +
                     "where co.person_id = @" + NAMED_PARTICIPANTID_PARAM + "\n" +
-                    "order by %s %s, condition_occurrence_id\n" +
-                    "limit %d offset %d\n";
+                    "order by %s %s, condition_occurrence_id\n";
 
     private static final String CONDITIONS_DETAIL_SQL_TEMPLATE =
       "select co.condition_start_datetime as itemDate,\n" +

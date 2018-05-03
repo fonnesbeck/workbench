@@ -20,8 +20,7 @@ public class MasterQueryBuilder implements ReviewQueryBuilder {
 
   private static final String OUTER_SQL_TEMPLATE =
     "select * from (${masterSqlTemplate})\n" +
-      "order by %s %s, dataId\n" +
-      "limit %d offset %d\n";
+      "order by %s %s, dataId\n";
 
   private static final String MASTER_SQL_TEMPLATE =
     "select t.${tablePrimaryKey} as dataId, " +

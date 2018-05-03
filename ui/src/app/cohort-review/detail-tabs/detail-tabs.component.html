@@ -42,7 +42,7 @@
   </clr-tab>
 
   <!-- Individual Tab Views -->
-  <clr-tab *ngFor="let tab of tabs">
+  <clr-tab *ngFor="let tab of tabs; let i = index">
     <button clrTabLink id="detail-{{ tab.name | lowercase }}-tab">
       {{ tab.name | titlecase }}
     </button>
@@ -50,8 +50,8 @@
       <app-detail-tab-table
         [tabname]="tab.name"
         [columns]="tab.columns"
-        [filterType]="tab.filterType"
-        [reverseEnum]="tab.reverseEnum"
+        [data]="tabbedData[i]"
+        [loading]="loading"
         >
       </app-detail-tab-table>
     </clr-tab-content>

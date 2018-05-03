@@ -1,17 +1,19 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+import {forkJoin} from 'rxjs/observable/forkJoin';
 
 import {
-    CohortReviewService,
-    PageFilterType,
-    ParticipantConditionsColumns,
-    ParticipantDevicesColumns,
-    ParticipantDrugsColumns,
-    ParticipantMasterColumns,
-    ParticipantMeasurementsColumns,
-    ParticipantObservationsColumns,
-    ParticipantProceduresColumns,
-    ParticipantVisitsColumns,
+  CohortReviewService,
+  PageFilterType,
+  ParticipantConditionsColumns,
+  ParticipantDevicesColumns,
+  ParticipantDrugsColumns,
+  ParticipantMasterColumns,
+  ParticipantMeasurementsColumns,
+  ParticipantObservationsColumns,
+  ParticipantProceduresColumns,
+  ParticipantVisitsColumns,
+  SortOrder,
 } from 'generated';
 
 /* The most common column types */
@@ -67,7 +69,7 @@ const ageAtEvent = {
   templateUrl: './detail-tabs.component.html',
   styleUrls: ['./detail-tabs.component.css']
 })
-export class DetailTabsComponent {
+export class DetailTabsComponent implements OnInit {
 
   readonly stubs = [
     'physical-measurements',
@@ -201,6 +203,8 @@ export class DetailTabsComponent {
   }];
 
 
+  tabbedData = [];
+  loading = false;
   detailsLoading = false;
   details;
 
@@ -208,6 +212,44 @@ export class DetailTabsComponent {
     private route: ActivatedRoute,
     private reviewApi: CohortReviewService,
   ) {}
+
+  ngOnInit() {
+    this.subscription = this.route.data
+      .map(({participant}) => participant)
+      .withLatestFrom(
+        this.route.parent.data.map(({cohort}) => cohort),
+        this.route.parent.data.map(({workspace}) => workspace),
+      )
+      .distinctUntilChanged()
+      .subscribe(([participant, cohort, workspace]) => {
+        this.tabbedData = [];
+        const calls = this.tabs.map(tab =>
+          this.reviewApi.getParticipantData(
+            workspace.namespace,
+            workspace.id,
+            cohort.id,
+            workspace.cdrVersionId,
+            participant.participantId,
+            {
+              page: 0,
+              pageSize: 25,
+              includeTotal: true,
+              sortOrder: SortOrder.Asc,
+              sortColumn: tab.reverseEnum[tab.columns[0].name],
+              pageFilterType: tab.filterType,
+            }
+          )
+        );
+
+        this.loading = true;
+        forkJoin(...calls).subscribe(results => {
+          setTimeout(() => {
+            this.tabbedData = results;
+            this.loading = false;
+          });
+        });
+      });
+  }
 
   detailView(datum) {
     this.detailsLoading = true;

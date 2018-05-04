@@ -1,20 +1,21 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {forkJoin} from 'rxjs/observable/forkJoin';
 
 import {
-  CohortReviewService,
-  PageFilterType,
-  ParticipantConditionsColumns,
-  ParticipantDevicesColumns,
-  ParticipantDrugsColumns,
-  ParticipantMasterColumns,
-  ParticipantMeasurementsColumns,
-  ParticipantObservationsColumns,
-  ParticipantProceduresColumns,
-  ParticipantVisitsColumns,
-  SortOrder,
+    CohortReviewService, PageFilterRequest,
+    PageFilterType,
+    ParticipantConditionsColumns,
+    ParticipantDevicesColumns,
+    ParticipantDrugsColumns,
+    ParticipantMasterColumns,
+    ParticipantMeasurementsColumns,
+    ParticipantObservationsColumns,
+    ParticipantProceduresColumns,
+    ParticipantVisitsColumns,
+    SortOrder,
 } from 'generated';
+import {Subscription} from 'rxjs/Subscription';
 
 /* The most common column types */
 const itemDate = {
@@ -69,30 +70,28 @@ const ageAtEvent = {
   templateUrl: './detail-tabs.component.html',
   styleUrls: ['./detail-tabs.component.css']
 })
-export class DetailTabsComponent implements OnInit {
+export class DetailTabsComponent implements OnInit, OnDestroy {
 
   readonly stubs = [
     'physical-measurements',
     'ppi',
   ];
 
-  readonly allEvents = {
-    name: 'All Events',
-    filterType: PageFilterType.ParticipantMasters,
-    columns: [
-      itemDate, domain, standardVocabulary, standardName, sourceVocabulary, sourceValue,
-    ],
-    reverseEnum: {
-      itemDate: ParticipantMasterColumns.ItemDate,
-      domain: ParticipantMasterColumns.Domain,
-      standardVocabulary: ParticipantMasterColumns.StandardVocabulary,
-      standardName: ParticipantMasterColumns.StandardName,
-      sourceValue: ParticipantMasterColumns.SourceValue,
-      sourceVocabulary: ParticipantMasterColumns.SourceVocabulary,
-    }
-  };
-
   readonly tabs = [{
+      name: 'All Events',
+      filterType: PageFilterType.ParticipantMasters,
+      columns: [
+          itemDate, domain, standardVocabulary, standardName, sourceVocabulary, sourceValue,
+      ],
+      reverseEnum: {
+          itemDate: ParticipantMasterColumns.ItemDate,
+          domain: ParticipantMasterColumns.Domain,
+          standardVocabulary: ParticipantMasterColumns.StandardVocabulary,
+          standardName: ParticipantMasterColumns.StandardName,
+          sourceValue: ParticipantMasterColumns.SourceValue,
+          sourceVocabulary: ParticipantMasterColumns.SourceVocabulary,
+      }
+  }, {
     name: 'Conditions',
     filterType: PageFilterType.ParticipantConditions,
     columns: [
@@ -206,6 +205,7 @@ export class DetailTabsComponent implements OnInit {
   tabbedData = [];
   loading = false;
   detailsLoading = false;
+  subscription: Subscription;
   details;
 
   constructor(
@@ -230,10 +230,9 @@ export class DetailTabsComponent implements OnInit {
             cohort.id,
             workspace.cdrVersionId,
             participant.participantId,
-            {
+              <PageFilterRequest>{
               page: 0,
               pageSize: 25,
-              includeTotal: true,
               sortOrder: SortOrder.Asc,
               sortColumn: tab.reverseEnum[tab.columns[0].name],
               pageFilterType: tab.filterType,
@@ -249,6 +248,10 @@ export class DetailTabsComponent implements OnInit {
           });
         });
       });
+  }
+
+  ngOnDestroy() {
+     this.subscription.unsubscribe();
   }
 
   detailView(datum) {

@@ -11,6 +11,7 @@ import {AdminReviewWorkspaceComponent} from './views/admin-review-workspace/comp
 import {CohortEditComponent} from './views/cohort-edit/component';
 import {LoginComponent} from './views/login/component';
 import {ProfilePageComponent} from './views/profile-page/component';
+import {SettingsComponent} from './views/settings/component';
 import {SignedInComponent} from './views/signed-in/component';
 import {WorkspaceEditComponent, WorkspaceEditMode} from './views/workspace-edit/component';
 import {WorkspaceListComponent} from './views/workspace-list/component';
@@ -89,13 +90,6 @@ const routes: Routes = [
                 breadcrumb: 'Clone Workspace'
               }
             }, {
-              path: 'share',
-              component: WorkspaceShareComponent,
-              data: {
-                title: 'Share Workspace',
-                breadcrumb: 'Share Workspace'
-              }
-            }, {
               path: 'cohorts/build',
               loadChildren: './cohort-search/cohort-search.module#CohortSearchModule',
               data: {
@@ -133,6 +127,10 @@ const routes: Routes = [
         path: 'profile',
         component: ProfilePageComponent,
         data: {title: 'Profile'}
+      }, {
+        path: 'settings',
+        component: SettingsComponent,
+        data: {title: 'Settings'}
       }, {
         path: 'workspace/build',
         component: WorkspaceEditComponent,

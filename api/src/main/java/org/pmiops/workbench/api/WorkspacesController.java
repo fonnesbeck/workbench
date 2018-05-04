@@ -4,16 +4,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import java.sql.Timestamp;
-import java.time.Clock;
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import javax.inject.Provider;
 import org.pmiops.workbench.annotations.AuthorityRequired;
 import org.pmiops.workbench.db.dao.CdrVersionDao;
 import org.pmiops.workbench.db.dao.UserDao;
@@ -23,36 +13,26 @@ import org.pmiops.workbench.db.model.CdrVersion;
 import org.pmiops.workbench.db.model.User;
 import org.pmiops.workbench.db.model.Workspace.FirecloudWorkspaceId;
 import org.pmiops.workbench.db.model.WorkspaceUserRole;
-import org.pmiops.workbench.exceptions.BadRequestException;
-import org.pmiops.workbench.exceptions.ConflictException;
-import org.pmiops.workbench.exceptions.ExceptionUtils;
-import org.pmiops.workbench.exceptions.FailedPreconditionException;
+import org.pmiops.workbench.exceptions.*;
 import org.pmiops.workbench.exceptions.NotFoundException;
-import org.pmiops.workbench.exceptions.ServerErrorException;
 import org.pmiops.workbench.firecloud.ApiException;
 import org.pmiops.workbench.firecloud.FireCloudService;
 import org.pmiops.workbench.google.CloudStorageService;
-import org.pmiops.workbench.model.Authority;
-import org.pmiops.workbench.model.CloneWorkspaceRequest;
-import org.pmiops.workbench.model.CloneWorkspaceResponse;
-import org.pmiops.workbench.model.DataAccessLevel;
-import org.pmiops.workbench.model.EmptyResponse;
-import org.pmiops.workbench.model.FileDetail;
-import org.pmiops.workbench.model.ResearchPurpose;
-import org.pmiops.workbench.model.ResearchPurposeReviewRequest;
-import org.pmiops.workbench.model.ShareWorkspaceRequest;
-import org.pmiops.workbench.model.ShareWorkspaceResponse;
-import org.pmiops.workbench.model.UnderservedPopulationEnum;
-import org.pmiops.workbench.model.UpdateWorkspaceRequest;
-import org.pmiops.workbench.model.UserRole;
-import org.pmiops.workbench.model.Workspace;
-import org.pmiops.workbench.model.WorkspaceAccessLevel;
-import org.pmiops.workbench.model.WorkspaceListResponse;
-import org.pmiops.workbench.model.WorkspaceResponse;
-import org.pmiops.workbench.model.WorkspaceResponseListResponse;
+import org.pmiops.workbench.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.inject.Provider;
+import java.sql.Timestamp;
+import java.time.Clock;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -427,6 +407,10 @@ public class WorkspacesController implements WorkspacesApiDelegate {
 
   @Override
   public ResponseEntity<EmptyResponse> deleteWorkspace(String workspaceNamespace, String workspaceId) {
+    //general note. When you delete a workspace the related rows in the following tables will also be deleted
+    //Cohort, cohort review, cohort annotation definition, cohort annotation enum value,
+    //participant cohort annotations, participant cohort status. Please see liquibase/db for more
+    //details on how these tables relate to each other.
     org.pmiops.workbench.db.model.Workspace dbWorkspace = workspaceService.getRequired(
         workspaceNamespace, workspaceId);
     try {
@@ -505,21 +489,28 @@ public class WorkspacesController implements WorkspacesApiDelegate {
         throw ExceptionUtils.convertFirecloudException(e);
       }
       for (WorkspaceUserRole userRole : user.getWorkspaceUserRoles()) {
-        org.pmiops.workbench.firecloud.model.WorkspaceResponse fcWorkspace;
+        org.pmiops.workbench.firecloud.model.WorkspaceResponse fcWorkspace = null;
         org.pmiops.workbench.db.model.Workspace dbWorkspace;
-        dbWorkspace = workspaceService.getRequired(userRole.getWorkspace().getWorkspaceNamespace(), userRole.getWorkspace().getFirecloudName());
-        fcWorkspace = fcWorkspaces.stream().filter(w -> w.getWorkspace().getName().equals(TO_CLIENT_WORKSPACE.apply(userRole.getWorkspace()).getId())).collect(Collectors.toList()).get(0);
+        dbWorkspace = userRole.getWorkspace();
+        List<org.pmiops.workbench.firecloud.model.WorkspaceResponse> filteredFcWorkspaces =
+            fcWorkspaces
+                .stream()
+                .filter(w -> w.getWorkspace().getName().equals(TO_CLIENT_WORKSPACE.apply(userRole.getWorkspace()).getId()))
+                .collect(Collectors.toList());
+        if (!filteredFcWorkspaces.isEmpty()) {
+          fcWorkspace = filteredFcWorkspaces.get(0);
+        }
         if (fcWorkspace == null) {
           //  remove from our database
           workspaceService.getDao().delete(dbWorkspace);
         } else {
-          if (userRole.getWorkspace().getFirecloudUuid() == null) {
+          if (dbWorkspace.getFirecloudUuid() == null) {
             // populate UUID
             dbWorkspace.setFirecloudUuid(fcWorkspace.getWorkspace().getWorkspaceId());
             workspaceService.getDao().save(dbWorkspace);
           }
           WorkspaceResponse currentWorkspace = new WorkspaceResponse();
-          currentWorkspace.setWorkspace(TO_CLIENT_WORKSPACE.apply(userRole.getWorkspace()));
+          currentWorkspace.setWorkspace(TO_CLIENT_WORKSPACE.apply(dbWorkspace));
           if (fcWorkspace.getAccessLevel().equals(WorkspaceService.PROJECT_OWNER_ACCESS_LEVEL)) {
             currentWorkspace.setAccessLevel(WorkspaceAccessLevel.OWNER);
           } else {

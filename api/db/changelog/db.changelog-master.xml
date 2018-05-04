@@ -40,4 +40,7 @@
   <include file="changelog/db.changelog-30-profile-text-fields-extension.xml"/>
   <include file="changelog/db.changelog-31-requested-id-verification.xml"/>
   <include file="changelog/db.changelog-32-firecloud-uuid.xml"/>
+  <include file="changelog/db.changelog-33-uniq-fc-uuid.xml"/>
+  <include file="changelog/db.changelog-34-update-fk-rules.xml"/>
+  <include file="changelog/db.changelog-35-another-fk-update.xml"/>
 </databaseChangeLog>

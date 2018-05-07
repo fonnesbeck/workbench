@@ -36,6 +36,18 @@ public class MasterQueryBuilder implements ReviewQueryBuilder {
       "left join `${projectId}.${dataSetId}.concept` c2 on t.${tableSourceConceptId} = c2.concept_id\n" +
       "where t.person_id = @" + NAMED_PARTICIPANTID_PARAM + "\n";
 
+  private static final String MASTER1_SQL_TEMPLATE =
+    "select data_id as dataId, " +
+      "     item_date as itemDate,\n" +
+      "     domain,\n" +
+      "     standard_vocabulary as standardVocabulary,\n" +
+      "     standard_name as standardName,\n" +
+      "     source_value as sourceValue,\n" +
+      "     source_vocabulary as sourceVocabulary,\n" +
+      "     source_name as sourceName\n" +
+      "from `${projectId}.${dataSetId}.participant_review`\n" +
+      "where person_id = @" + NAMED_PARTICIPANTID_PARAM + "\n";
+
   private static final String UNION = "union all\n";
 
   private static final String MASTER_SQL_COUNT_TEMPLATE =
@@ -44,7 +56,7 @@ public class MasterQueryBuilder implements ReviewQueryBuilder {
 
   @Override
   public String getQuery() {
-    return OUTER_SQL_TEMPLATE.replace("${masterSqlTemplate}", String.join(UNION, buildDomainSql()));
+    return MASTER1_SQL_TEMPLATE;
   }
 
   @Override

@@ -16,7 +16,6 @@ export class DetailAllEventsComponent extends DetailTabTableComponent {
   @Input() columns;
   @Input() filterType;
   @Input() reverseEnum;
-  @Input() data;
 
   @Output() onRowClick = new EventEmitter();
   onClick(datum) { this.onRowClick.emit(datum); }

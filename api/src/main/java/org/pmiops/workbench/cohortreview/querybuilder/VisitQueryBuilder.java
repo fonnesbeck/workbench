@@ -11,20 +11,18 @@ import java.util.Optional;
 public class VisitQueryBuilder implements ReviewQueryBuilder {
 
   private static final String VISITS_SQL_TEMPLATE =
-    "select vo.visit_start_datetime as itemDate,\n" +
-      "       vo.visit_end_datetime as endDate,\n" +
-      "       c1.vocabulary_id as standardVocabulary,\n" +
-      "       c1.concept_name as standardName,\n" +
-      "       vo.visit_source_value as sourceValue,\n" +
-      "       c2.vocabulary_id as sourceVocabulary,\n" +
-      "       c2.concept_name as sourceName,\n" +
-      "       CAST(FLOOR(DATE_DIFF(visit_start_date, DATE(p.year_of_birth, p.month_of_birth, p.day_of_birth), MONTH)/12) as INT64) as age\n" +
-      "from `${projectId}.${dataSetId}.visit_occurrence` vo\n" +
-      "left join `${projectId}.${dataSetId}.concept` c1 on vo.visit_concept_id = c1.concept_id\n" +
-      "left join `${projectId}.${dataSetId}.concept` c2 on vo.visit_source_concept_id = c2.concept_id\n" +
-      "join `${projectId}.${dataSetId}.person` p on vo.person_id = p.person_id\n" +
-      "where vo.person_id = @" + NAMED_PARTICIPANTID_PARAM + "\n" +
-      "order by %s %s, visit_occurrence_id\n";
+    "select item_date as itemDate,\n" +
+      "       item_date as endDate,\n" +
+      "       standard_vocabulary as standardVocabulary,\n" +
+      "       standard_name as standardName,\n" +
+      "       source_value as sourceValue,\n" +
+      "       source_vocabulary as sourceVocabulary,\n" +
+      "       source_name as sourceName,\n" +
+      "       age_at_event as age\n" +
+      "from `${projectId}.${dataSetId}.participant_review`\n" +
+      "where person_id = @" + NAMED_PARTICIPANTID_PARAM + "\n" +
+      "and domain = 'Visit'\n" +
+      "order by %s %s, data_id\n";
 
   private static final String VISITS_DETAIL_SQL_TEMPLATE =
     "select vo.visit_start_datetime as itemDate,\n" +

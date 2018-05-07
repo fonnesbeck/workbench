@@ -77,21 +77,23 @@ export class DetailTabsComponent implements OnInit, OnDestroy {
     'ppi',
   ];
 
+  readonly allEvents = {
+    name: 'All Events',
+    filterType: PageFilterType.ParticipantMasters,
+    columns: [
+      itemDate, domain, standardVocabulary, standardName, sourceVocabulary, sourceValue,
+    ],
+    reverseEnum: {
+      itemDate: ParticipantMasterColumns.ItemDate,
+      domain: ParticipantMasterColumns.Domain,
+      standardVocabulary: ParticipantMasterColumns.StandardVocabulary,
+      standardName: ParticipantMasterColumns.StandardName,
+      sourceValue: ParticipantMasterColumns.SourceValue,
+      sourceVocabulary: ParticipantMasterColumns.SourceVocabulary,
+    }
+  };
+
   readonly tabs = [{
-      name: 'All Events',
-      filterType: PageFilterType.ParticipantMasters,
-      columns: [
-          itemDate, domain, standardVocabulary, standardName, sourceVocabulary, sourceValue,
-      ],
-      reverseEnum: {
-          itemDate: ParticipantMasterColumns.ItemDate,
-          domain: ParticipantMasterColumns.Domain,
-          standardVocabulary: ParticipantMasterColumns.StandardVocabulary,
-          standardName: ParticipantMasterColumns.StandardName,
-          sourceValue: ParticipantMasterColumns.SourceValue,
-          sourceVocabulary: ParticipantMasterColumns.SourceVocabulary,
-      }
-  }, {
     name: 'Conditions',
     filterType: PageFilterType.ParticipantConditions,
     columns: [
@@ -202,8 +204,8 @@ export class DetailTabsComponent implements OnInit, OnDestroy {
   }];
 
 
-  tabbedData = [];
   loading = false;
+  tabbedData = [];
   detailsLoading = false;
   subscription: Subscription;
   details;

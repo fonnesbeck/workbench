@@ -75,9 +75,20 @@ public class QuestionConcept {
                 Long qid = Long.valueOf(r.getStratum2());
                 QuestionConcept q = questionMap.get(qid);
 
+
+                if (q == null) {
+                    System.out.println("question is null " + qid.toString() + " Why can this be null ? Question is not on the survey Survey id is " + r.getStratum1());
+                    continue;
+                }
+
                 if ( q.getAnalysis(analysis.getAnalysisId())  == null) {
+                    System.out.println("Analysis id " + analysis.getAnalysisId().toString() + analysis.getAnalysisName());
                     q.setAnalysis(new AchillesAnalysis(analysis));
                 }
+                else {
+                    System.out.println("Analysis already on question  " + analysis.toString());
+                }
+
                 AchillesAnalysis questionAnalysis = q.getAnalysis(analysis.getAnalysisId());
                 questionAnalysis.addResult(r);
                 String rStratum5Name = r.getStratum5Name();

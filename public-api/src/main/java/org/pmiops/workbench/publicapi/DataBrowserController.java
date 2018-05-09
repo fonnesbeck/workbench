@@ -16,6 +16,8 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+
 @RestController
 public class DataBrowserController implements DataBrowserApiDelegate {
 
@@ -29,6 +31,9 @@ public class DataBrowserController implements DataBrowserApiDelegate {
     private AchillesResultDao achillesResultDao;
     @Autowired
     private DbDomainDao dbDomainDao;
+
+    private EntityManager entityManager;
+
 
     public static final long PARTICIPANT_COUNT_ANALYSIS_ID = 1;
     public static final long COUNT_ANALYSIS_ID = 3000;
@@ -246,7 +251,19 @@ public class DataBrowserController implements DataBrowserApiDelegate {
                 for (QuestionConcept q : questions) {
                     qlist.add(String.valueOf(q.getConceptId()));
                 }
-                mapAnalyses(surveyConceptId,qlist,questions);
+
+                /*** Important -- when calling these dao functions in a loop, baceause the analyses share same id ,
+                 * and we are filtering by a property in the related reluslts table, the first results get cached and
+                 * put on all questions. So we have to detach the entity from the session
+                 */
+                List<AchillesAnalysis> analyses = achillesAnalysisDao.findSurveyAnalysisResults(surveyConceptId,qlist);
+                //THIS IS THE IMPORTANT PART
+                //You have to detach the entity from the session otherwise all the results are same as the first
+                // question... Thank you https://stackoverflow.com/a/49452056/2627999
+                analyses.forEach(analysis -> {
+                            this.entityManager.detach(analysis);
+                        });
+                QuestionConcept.mapAnalysesToQuestions(questions, analyses);
             }
         }
 

@@ -192,6 +192,6 @@ public class AchillesAnalysis {
 
     @Override
     public String toString() {
-        return  ToStringBuilder.reflectionToString(this);
+        return  this.analysisName + " " + this.analysisId + " " + this.stratum1Name;
     }
 }

@@ -213,14 +213,47 @@ public class DataBrowserController implements DataBrowserApiDelegate {
             for (QuestionConcept q : questions) {
                 qlist.add(String.valueOf(q.getConceptId()));
             }
-
+/*
             List<AchillesAnalysis> analyses = achillesAnalysisDao.findSurveyAnalysisResults(surveyConceptId, qlist);
             QuestionConcept.mapAnalysesToQuestions(questions, analyses);
+            */
+
+            mapAnalyses(surveyConceptId,qlist,questions);
         }
+
 
         resp.setItems(questions.stream().map(TO_CLIENT_QUESTION_CONCEPT).collect(Collectors.toList()));
         return ResponseEntity.ok(resp);
     }
+
+
+    public void mapAnalyses(String surveyConceptId,List<String> qids,List<QuestionConcept> questions){
+        List<AchillesAnalysis> analyses = achillesAnalysisDao.findSurveyAnalysisResults(surveyConceptId,qids);
+        QuestionConcept.mapAnalysesToQuestions(questions, analyses);
+    }
+
+    @Override
+    public ResponseEntity<QuestionConceptListResponse> getSurveyConceptsMatchingSearch(String keyword){
+
+        List<DbDomain> surveys=dbDomainDao.findByDbTypeAndAndConceptIdNotNull("survey");
+        for(DbDomain survey:surveys) {
+            
+            String surveyConceptId=String.valueOf(survey.getConceptId());
+            List<QuestionConcept> questions = questionConceptDao.findSurveyQuestions(Long.valueOf(survey.getConceptId()));
+
+            if (!questions.isEmpty()) {
+                List<String> qlist = new ArrayList();
+                for (QuestionConcept q : questions) {
+                    qlist.add(String.valueOf(q.getConceptId()));
+                }
+                mapAnalyses(surveyConceptId,qlist,questions);
+            }
+        }
+
+        return null;
+    }
+
+
 
     /**
      * This method searches concepts

@@ -42,10 +42,29 @@ paths:
           name: survey_concept_id
           type: string
           required: true
-          description: survey concept id
+          description: survey concept ids
       responses:
         200:
           description: A collection of survey modules
+          schema:
+            $ref: "#/definitions/QuestionConceptListResponse"
+
+  /v1/databrowser/survey-concept-search:
+    get:
+      security: []
+      tags:
+        - dataBrowser
+      description: Gets the list of questions that match a keyword
+      operationId: "getSurveyConceptsMatchingSearch"
+      parameters:
+        - in: query
+          name: keyword
+          type: string
+          required: true
+          description: search key word
+      responses:
+        200:
+          description: A collection of questions
           schema:
             $ref: "#/definitions/QuestionConceptListResponse"
 

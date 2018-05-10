@@ -49,6 +49,25 @@ paths:
           schema:
             $ref: "#/definitions/QuestionConceptListResponse"
 
+  /v1/databrowser/survey-search:
+    get:
+      security: []
+      tags:
+        - dataBrowser
+      description: Gets list of questions that match the keyword
+      operationId: "getSurveyMatch"
+      parameters:
+        - in: query
+          name: keyword
+          type: string
+          required: true
+          description: search keyword
+      responses:
+        200:
+          description: A collection of survey modules
+          schema:
+            $ref: "#/definitions/SurveyMatchList"
+
   /v1/databrowser/participant-count:
     get:
       security: []
@@ -308,6 +327,15 @@ definitions:
         items:
           $ref: "#/definitions/QuestionConcept"
 
+  SurveyMatchList:
+    type: object
+    required:
+      - items
+    properties:
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/QuestionConceptListResponse"
 
   AchillesResult:
     type: object

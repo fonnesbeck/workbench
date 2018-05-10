@@ -108,10 +108,14 @@ public class DataBrowserController implements DataBrowserApiDelegate {
                 @Override
                 public org.pmiops.workbench.model.QuestionConceptListResponse apply(QuestionConceptListResponse concept) {
 
+                        try {
+                            return new org.pmiops.workbench.model.QuestionConceptListResponse()
+                                    .survey(concept.getSurvey())
+                                    .items(concept.getItems());
+                        }catch(Exception e){
+                            return null;
+                        }
 
-                    return new org.pmiops.workbench.model.QuestionConceptListResponse()
-                            .survey(concept.getSurvey())
-                            .items(concept.getItems());
                 }
             };
 
@@ -225,24 +229,33 @@ public class DataBrowserController implements DataBrowserApiDelegate {
             List<String> qids=new ArrayList<String>();
 
             String reg=String.format("[[:<:]]%s[[:>:]]",keyword);
+            reg=reg.replace("\"","");
+            System.out.println(reg);
             for(QuestionConcept q:questions){
                 String qid=String.valueOf(q.getConceptId());
+              //  System.out.println(qid);
                 List<AchillesResult> results=achillesResultDao.findAchillesResults(stringSurveyConceptId,qid,reg);
+               // System.out.println(results);
+              //  System.out.println(q.getConceptName());
                 if(q.getConceptName().contains(keyword) || results.size()>0){
                         qids.add(qid);
                         matchingQuestions.add(q);
                 }
             }
+            if(qids.size() > 0){
+                List<AchillesAnalysis> analyses = achillesAnalysisDao.findSurveyAnalysisResults(stringSurveyConceptId, qids);
+                QuestionConcept.mapAnalysesToQuestions(matchingQuestions, analyses);
 
-            List<AchillesAnalysis> analyses = achillesAnalysisDao.findAchillesResults(stringSurveyConceptId, qids);
-            QuestionConcept.mapAnalysesToQuestions(matchingQuestions, analyses);
+                QuestionConceptListResponse questionConceptListResponse=new QuestionConceptListResponse();
+                questionConceptListResponse.setSurvey(TO_CLIENT_DBDOMAIN.apply(survey));
 
-            QuestionConceptListResponse questionConceptListResponse=new QuestionConceptListResponse();
-            questionConceptListResponse.setSurvey(TO_CLIENT_DBDOMAIN.apply(survey));
+                questionConceptListResponse.setItems(matchingQuestions.stream().map(TO_CLIENT_QUESTION_CONCEPT).collect(Collectors.toList()));
 
-            questionConceptListResponse.setItems(matchingQuestions.stream().map(TO_CLIENT_QUESTION_CONCEPT).collect(Collectors.toList()));
+                searchItems.add(questionConceptListResponse);
+            }else{
+                searchItems.add(null);
+            }
 
-            searchItems.add(questionConceptListResponse);
         }
 
         surveyMatchList.setItems(searchItems.stream().map(TO_CLIENT_QUESTION_CONCEPT_LIST_RESPONSE).collect(Collectors.toList()));
